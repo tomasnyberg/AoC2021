@@ -10,21 +10,11 @@ public class Solution {
     }
     
     public static int problemOne(){
-        int[] data = parseInputToArray();
-        int count = 0;
-        for(int i = 1; i < data.length; i++){
-            count += data[i] > data[i-1] ? 1:0;
-        }
-        return count;
+        return 0;
     }
 
     public static int problemTwo(){
-        int[] data = parseInputToArray();
-        int count = 0;
-        for(int i = 3; i < data.length; i++){
-            count += data[i] > data[i-3] ? 1:0; 
-        }
-        return count;
+        return 0;
     }
     public static int[] parseInputToArray(){
         try {
