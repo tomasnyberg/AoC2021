@@ -16,7 +16,7 @@ public class Solution {
     public static int problemTwo(){
         return 0;
     }
-    public static int[] parseInputToArray(){
+    public static ArrayList<String> parseInputToArray(){
         try {
             BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
@@ -25,7 +25,7 @@ public class Solution {
                 list.add(line);
                 line = reader.readLine();
             }
-            return list.stream().mapToInt(x -> Integer.parseInt(x)).toArray();
+            return list;
         } catch (Exception e){
             System.out.println("error");
             return null;
