@@ -26,7 +26,7 @@ public class Solution {
     
     public static int problemTwo(){
         ArrayList<String> input = parseInputToArray();
-        int[][] matrix = new int[1000][1000];
+        int[][] matrix = new int[1000][1000]; // CHANGEME
         for(String s: input){
             int[] coords = new int[4];
             coords[0] = Integer.parseInt(s.split(" -> ")[0].split(",")[0]);
@@ -36,20 +36,32 @@ public class Solution {
             drawLineStraight(matrix, coords[0], coords[1], coords[2], coords[3]);
             drawLineDiagonal(matrix, coords[0], coords[1], coords[2], coords[3]);
         }
+        // for(int[] xs: matrix){
+        //     System.out.println(Arrays.toString(xs));
+        // }
         return calculateOverlap(matrix);
     }
 
 
     public static void drawLineDiagonal(int[][] matrix, int x1, int y1, int x2, int y2){
-        if((x1 == x2 || y1 == y2) && !(allEqual(x1, x2, y1, y2))){
+        if(x1 == x2 || y1 == y2){
             return;
         }
-        int startx = Math.min(x1, x2);
-        int endx = Math.max(x1, x2);
-        int starty = Math.min(y1, y2);
-        int endy = Math.max(y1, y2);
-        for(int i = 0; i <= endx - startx; i++){
-            matrix[starty + i][startx + i]++;
+        if((x1 < x2 && y1 < y2) || (x1 > x2 && y1 > y2)){
+            int startx = Math.min(x1, x2);
+            int endx = Math.max(x1, x2);
+            int starty = Math.min(y1, y2);
+            for(int i = 0; i <= endx - startx; i++){
+                matrix[starty + i][startx + i]++;
+            }
+        } else {
+            int startx = Math.min(x1, x2);
+            int endx = Math.max(x1, x2);
+            int starty = Math.max(y1, y2);
+            int endy = Math.min(y1, y2);
+            for(int i = 0; i <= endx-startx; i++){
+                matrix[starty - i][startx + i]++;
+            }
         }
     }
 
