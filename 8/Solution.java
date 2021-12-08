@@ -17,7 +17,7 @@ import java.util.*;
 */
 public class Solution {
     public static void main(String[] args){
-        // System.out.println(problemOne());
+        System.out.println(problemOne());
         System.out.println(problemTwo());
     }
     
@@ -26,9 +26,7 @@ public class Solution {
         int sum = 0;
         Set<Integer> set = new HashSet<>(Arrays.asList(2,3,4,7));
         for(String s: list){
-            String secondPart = s.split("\s\\|\s")[1];
-            // String secondPart = s.split("\\|")[1]; // for example input
-            String[] parts = secondPart.split(" ");
+            String[] parts = s.split("\s\\|\s")[1].split(" ");
             for(String part: parts){
                 if(set.contains(part.length())){
                     sum++;
@@ -42,29 +40,33 @@ public class Solution {
         ArrayList<String> list = parseInputToArray();
         int sum = 0;
         for(String s: list){
-            HashMap<String, Integer> m = generateMap();
-            String[] firstPart = s.split("\s\\|\s")[0].split(" "); 
             String[] secondPart = s.split("\s\\|\s")[1].split(" ");  
             int[] counter = new int[7];
-            // count the amount of chars in total across the whole input string
-            for(String digit: firstPart){
+            // count the amount of chars in total across the whole input string (before |)
+            for(String digit: s.split("\s\\|\s")[0].split(" ")){
                 digit.chars().forEach(x -> counter[x - 97]++);
             }
-            String allOutputs = "";
-            for(int i = 0; i < secondPart.length; i++){
-                String result = "";
-                for(Character x: secondPart[i].toCharArray()){
-                    result += counter[x-97];
-                }
-                char[] ca = result.toCharArray();
-                Arrays.sort(ca);
-                result = String.valueOf(ca); // result can here get the right digit from the map
-                allOutputs += m.get(result);
-            }
+            String allOutputs = generateOutput(counter, secondPart);
             sum += Integer.parseInt(allOutputs);
         }
         return sum;
     }
+    
+    public static String generateOutput(int[] counter, String[] secondPart){
+        HashMap<String, Integer> m = generateMap();
+        String output = "";
+        for(int i = 0; i < secondPart.length; i++){
+            StringBuilder sb = new StringBuilder();
+            for(Character x: secondPart[i].toCharArray()){
+                sb.append(counter[x-97]);
+            }
+            char[] ca = sb.toString().toCharArray();
+            Arrays.sort(ca);
+            output += m.get(String.valueOf(ca));
+        }
+        return output;
+    }
+
     // {'467889': 0, '89': 1, '47788': 2, '77889': 3, '6789': 4, '67789': 5, '467789': 6, '889': 7, '4677889': 8, '677889': 9}
     public static HashMap<String, Integer> generateMap(){
         HashMap<String, Integer> result = new HashMap<>();
