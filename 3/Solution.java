@@ -7,11 +7,11 @@ import java.util.Arrays;
 
 public class Solution {
     public static void main(String[] args){
-        // System.out.println(problemOne());
+        System.out.println(problemOne());
         System.out.println(problemTwo());
     }
     
-    public static String[] problemOne(){
+    public static int problemOne(){
         List<String> list = parseInputToArray();
         int[] counter = new int[list.get(0).length()];
         for(String s: list){
@@ -22,78 +22,43 @@ public class Solution {
         String gamma = "";
         String epsilon = "";
         for(int i = 0; i < list.get(0).length(); i++){
-            if(counter[i] >= list.size()/2){
-                gamma += "1";
-                epsilon += "0";
-            } else {
-                gamma += "0";
-                epsilon += "1";
-            }
+            gamma += counter[i] >= list.size()/2 ? "1":"0";
+            epsilon += counter[i] >= list.size()/2 ? "0":"1";
         }
-        System.out.println("Gamma: " + gamma + " Epsilon: " + epsilon);
-        String[] result = {gamma, epsilon};
-        return result;
+        return Integer.parseInt(gamma, 2) * Integer.parseInt(epsilon, 2);
     }
     
     
     // Måste räkna om counter för varje gång man tar bort ett element
     public static int problemTwo(){
-        List<String> oxygenList = parseInputToArray();
+        List<String> list = parseInputToArray();
         List<String> co2List = parseInputToArray();
-        int wordLen = oxygenList.get(0).length();
-        int oxygen = 0;
-        int co2 = 0;
-        int col = 0;
-        while(oxygenList.size() > 1){
-            // Count the amount of ones in the current position (i)
-            int ones = 0;
-            int zeroes = 0;
-            for(int j = 0; j < oxygenList.size(); j++){
-                if(oxygenList.get(j).charAt(col) == '0'){
-                    zeroes++;
-                } else {
-                    ones++;
-                }
-            }
-            char curr = ones >= zeroes ? '1':'0';
-            for(int j = oxygenList.size() - 1; j >= 0; j--){
-                if(oxygenList.get(j).charAt(col) != curr){
-                    oxygenList.remove(j);
-                }
-            }
-            col++;
-        }
-        col = 0;
-        while(co2List.size() > 1){
-            // Count the amount of ones in the current position (i)
-            int ones = 0;
-            int zeroes = 0;
-            for(int j = 0; j < co2List.size(); j++){
-                if(co2List.get(j).charAt(col) == '0'){
-                    zeroes++;
-                } else {
-                    ones++;
-                }
-            }
-            char curr = zeroes <= ones ? '0' : '1';
-            for(int j = co2List.size() - 1; j >= 0; j--){
-                if(co2List.get(j).charAt(col) != curr){
-                    co2List.remove(j);
-                }
-            }
-            col++;
-        }
-        System.out.println(oxygenList.get(0));
-        System.out.println(co2List.get(0));
-        oxygen = Integer.parseInt(oxygenList.get(0), 2);
-        co2 = Integer.parseInt(co2List.get(0), 2);
-        return oxygen * co2;
+        filterList(co2List, false);
+        filterList(list, true);
+        return Integer.parseInt(list.get(0), 2) * Integer.parseInt(co2List.get(0), 2);
     }
 
-
-
-
-
+    public static void filterList(List<String> list, boolean change){
+        int col = 0;
+        while(list.size() > 1){
+            // Count the amount of ones in the current position (i)
+            int ones = 0;
+            for(int j = 0; j < list.size(); j++){
+                ones += list.get(j).charAt(col) == '0' ? 0:1;
+            }
+            char curr = (list.size()+1)/2 <= ones ? '0' : '1';
+            curr = change ? curr:curr == '1' ? '0':'1';
+            for(int j = list.size() - 1; j >= 0; j--){
+                if(list.get(j).charAt(col) != curr){
+                    list.remove(j);
+                }
+                if(list.size() == 1){
+                    return;
+                }
+            }
+            col++;
+        }
+    }
 
     public static List<String> parseInputToArray(){
         try {
