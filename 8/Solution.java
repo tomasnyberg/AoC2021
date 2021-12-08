@@ -40,13 +40,10 @@ public class Solution {
         ArrayList<String> list = parseInputToArray();
         int sum = 0;
         for(String s: list){
-            String[] secondPart = s.split("\s\\|\s")[1].split(" ");  
             int[] counter = new int[7];
             // count the amount of chars in total across the whole input string (before |)
-            for(String digit: s.split("\s\\|\s")[0].split(" ")){
-                digit.chars().forEach(x -> counter[x - 97]++);
-            }
-            String allOutputs = generateOutput(counter, secondPart);
+            Arrays.stream(s.split("\s\\|\s")[0].split(" ")).forEach(x -> x.chars().forEach(y -> counter[y - 97]++));
+            String allOutputs = generateOutput(counter, s.split("\s\\|\s")[1].split(" "));
             sum += Integer.parseInt(allOutputs);
         }
         return sum;
@@ -54,17 +51,15 @@ public class Solution {
     
     public static String generateOutput(int[] counter, String[] secondPart){
         HashMap<String, Integer> m = generateMap();
-        String output = "";
+        StringBuilder output = new StringBuilder();
         for(int i = 0; i < secondPart.length; i++){
             StringBuilder sb = new StringBuilder();
-            for(Character x: secondPart[i].toCharArray()){
-                sb.append(counter[x-97]);
-            }
+            secondPart[i].chars().forEach(x -> sb.append(counter[x-97]));
             char[] ca = sb.toString().toCharArray();
             Arrays.sort(ca);
-            output += m.get(String.valueOf(ca));
+            output.append(m.get(String.valueOf(ca)));
         }
-        return output;
+        return output.toString();
     }
 
     // {'467889': 0, '89': 1, '47788': 2, '77889': 3, '6789': 4, '67789': 5, '467789': 6, '889': 7, '4677889': 8, '677889': 9}
