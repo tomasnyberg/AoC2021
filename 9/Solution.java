@@ -46,7 +46,7 @@ public class Solution {
             return 0;
         }
         int val = matrix[i][j];
-        if(val != prev+1 || val == 9){
+        if(val == 9){
             return 0;
         }
         visited[i][j] = true;
