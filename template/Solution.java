@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.Buffer;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Solution {
     public static void main(String[] args){
@@ -25,6 +24,7 @@ public class Solution {
                 list.add(line);
                 line = reader.readLine();
             }
+            reader.close();
             return list;
         } catch (Exception e){
             System.out.println("error");
