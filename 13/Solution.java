@@ -1,16 +1,16 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Solution {
     public static void main(String[] args){
         System.out.println(problemOne());
-        System.out.println(problemTwo());
+        problemTwo();
     }
     
     public static int problemOne(){
         int[][] matrix = generateArray();
-        //filter out all folds to the following format: "x=7", "y=5"
         List<String> folds = generateFolds();
         if(folds.get(0).charAt(0) == 'x'){
             matrix = foldLeft(matrix);
@@ -28,13 +28,14 @@ public class Solution {
             for(int j = 0; j < matrix[0].length/2; j++){
                 result[i][j] = matrix[i][j];
             }
-            //copy the ones that are on the right side to the left
         }
         for(int i = 0; i < matrix.length; i++){
+            //copy the ones that are on the right side to the left
             for(int j = matrix[0].length/2 + 1; j < matrix[0].length; j++){
-                int newcol = j % (matrix[0].length/2 + 1);
+                int newcol = matrix[0].length/2 - j % (matrix[0].length/2 + 1) - 1;
                 //Math max since we don't want to remove previous ones
-                result[i][matrix[0].length/2 - newcol-1] = Math.max(matrix[i][j], result[i][matrix[0].length/2 - newcol-1]); 
+                int val = Math.max(matrix[i][j], result[i][newcol]);
+                result[i][newcol] = val; 
             }
         }
         return result;
@@ -50,18 +51,17 @@ public class Solution {
         }
         for(int i = matrix.length/2 + 1; i < matrix.length; i++){
             for(int j = 0; j < matrix[0].length; j++){
-                int newrow = i % (matrix.length/2 + 1);
-                result[matrix.length/2 - newrow - 1][j] = Math.max(matrix[i][j], result[matrix.length/2 - newrow - 1][j]);
+                int newrow = matrix.length/2 - i % (matrix.length/2 + 1) - 1;
+                int val = Math.max(matrix[i][j], result[newrow][j]);
+                result[newrow][j] = val;
             }
         }
         return result;
     }
 
-    public static int problemTwo(){
+    public static void problemTwo(){
         int[][] matrix = generateArray();
-        //filter out all folds to the following format: "x=7", "y=5"
         List<String> folds = generateFolds();
-        System.out.println(folds.size());
         for(String s: folds){
             if(s.charAt(0) == 'x'){
                 matrix = foldLeft(matrix);
@@ -69,57 +69,44 @@ public class Solution {
                 matrix = foldUp(matrix);
             }
         }
-        for(var xs: matrix){
-            
-            System.out.println(Arrays.toString(xs));
+        prettyPrint(matrix);
+    }
+    
+    public static void prettyPrint(int[][] matrix){
+        for(int i = 0;i < matrix.length; i++){
+            for(int j = 0; j < matrix[0].length; j++){
+                if(j % 5 == 0 && j != 0){
+                    System.out.print("   ");
+                }
+                System.out.print(matrix[i][j] == 1 ? "X":" ");
+            }
+            System.out.println();
         }
-        System.out.println();
-        return 0;
     }
     
     public static int countdots(int[][] matrix){
-        int sum = 0;
-        for(var xs: matrix){
-            for(Integer x: xs){
-                sum += x;
-            }
-        }
-        return sum;
+        return Arrays.stream(matrix).map(xs -> IntStream.of(xs).sum())
+                                        .mapToInt(x -> (int) x).sum();
     }
 
-
+    //filter out all folds to the following format: "x=7", "y=5"
     public static List<String> generateFolds(){
-        ArrayList<String> list = parseInputToArray();
-        List<String> result = new ArrayList<>();
-        for(String s: list){
-            if(!s.isEmpty() && s.startsWith("fold")){
-                result.add(s);
-            }
-        }
-        result = result.stream().map(s -> s.split(" ")[2]).toList();
-        // for(String s: result){
-        //     System.out.println(s);
-        // }
-        return result;
+        return parseInputToArray().stream()
+                .filter(s -> !s.isEmpty() && s.startsWith("fold"))
+                .map(s -> s.split(" ")[2])
+                .toList();
     }
 
     public static int[][] generateArray(){
-        ArrayList<String> list = parseInputToArray();
-        ArrayList<String> coords = new ArrayList<>();
-        for(String s: list){
-            if(!s.isEmpty() && Character.isDigit(s.charAt(0))){
-                coords.add(s);
-            }
-        }
+        List<String> list = parseInputToArray();
+        list = list.stream().filter(s -> !s.isEmpty() && Character.isDigit(s.charAt(0))).toList();
+        //get max dimensions
         int[] dimensions = new int[2];
-        for(String s: coords){
-            int x = Integer.parseInt(s.split(",")[0]);
-            int y = Integer.parseInt(s.split(",")[1]);
-            dimensions[0] = Math.max(dimensions[0], x);
-            dimensions[1] = Math.max(dimensions[1], y);
-        }
+        dimensions[0] = list.stream().mapToInt(s -> Integer.parseInt(s.split(",")[0])).max().getAsInt();
+        dimensions[1] = list.stream().mapToInt(s -> Integer.parseInt(s.split(",")[1])).max().getAsInt();
+        //Insert all ones
         int[][] result = new int[dimensions[1] + 1][dimensions[0] + 1];
-        for(String s: coords){
+        for(String s: list){
             int x = Integer.parseInt(s.split(",")[1]);
             int y = Integer.parseInt(s.split(",")[0]);
             result[x][y] = 1;
@@ -127,7 +114,7 @@ public class Solution {
         return result;
     }
 
-    public static ArrayList<String> parseInputToArray(){
+    public static List<String> parseInputToArray(){
         try {
             BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
