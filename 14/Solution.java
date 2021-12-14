@@ -6,21 +6,21 @@ import java.util.stream.LongStream;
 
 public class Solution {
     public static void main(String[] args){
-        System.out.println(problemOne());
-        System.out.println(problemTwo());
+        System.out.println(problemOne(10));
+        System.out.println(problemTwo(40));
     }
     
-    public static long problemOne(){
-        int iterations = 40;
+    public static long problemOne(int iterations){
         HashMap<String, String> templates = getTemplates(); // example : NN -> C
         HashMap<String,Long> pairCounter = generateInputPairs(); // convert input, ex. NNCB to [NN -> 1, NC -> 1, CB -> 1] 
         for(int i = 0; i < iterations; i++){ // run for iterations steps
+            // temporary map since we don't want to create new pairs until we've reached the end of the step
             HashMap<String, Long> newPairCounter = new HashMap<>(pairCounter);
-
-            //TODO: need to check for all of them not just one
             for(String pair: pairCounter.keySet()){
                 if(templates.containsKey(pair)){
-                    newPairCounter.put(pair, newPairCounter.get(pair) - pairCounter.get(pair)); // decrement the current pair which gets ruined
+                    // count down  the current pair which gets ruined, one for every occurrence
+                    newPairCounter.put(pair, newPairCounter.get(pair) - pairCounter.get(pair)); 
+                    //Construct the new pairs that are created when we insert the letter
                     String left = pair.charAt(0) + templates.get(pair);
                     String right = templates.get(pair) + pair.charAt(1);
                     // put in both the new pairs
@@ -28,6 +28,7 @@ public class Solution {
                     newPairCounter.put(right, newPairCounter.getOrDefault(right, 0L) + pairCounter.get(pair)); 
                 }
             }
+            // change the current map since we've reached the end of the step
             pairCounter = newPairCounter;
         }
         System.out.println(pairCounter);
@@ -40,8 +41,8 @@ public class Solution {
         return LongStream.of(counter).max().getAsLong() - LongStream.of(counter).filter(x -> x != 0).min().getAsLong();
     }
     
-    public static int problemTwo(){
-        return 0;
+    public static long problemTwo(int iterations){
+        return problemOne(iterations);
     }
 
     public static HashMap<String, Long> generateInputPairs(){
@@ -55,20 +56,16 @@ public class Solution {
     }
     
     public static HashMap<String, String> getTemplates(){
-        ArrayList<String> list = parseInputToArray();
-        ArrayList<String> templateList = new ArrayList<>();
-        for(int i = 2; i < list.size(); i++){
-            templateList.add(list.get(i));
-        }
+        List<String> list = parseInputToArray();
+        list = list.subList(2, list.size());
         HashMap<String, String> templates = new HashMap<>();
-        for(String s: templateList){
-            String from = s.split(" -> ")[0];
-            String to = s.split(" -> ")[1];
-            templates.put(from, to);
+        for(String s: list){
+            String[] fromTo = s.split(" -> ");
+            templates.put(fromTo[0], fromTo[1]);
         }
         return templates;
     }
-    public static ArrayList<String> parseInputToArray(){
+    public static List<String> parseInputToArray(){
         try {
             BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
