@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class Solution {
     public static void main(String[] args){
@@ -9,12 +10,12 @@ public class Solution {
         System.out.println(problemTwo());
     }
     
-    public static int problemOne(){
-        int iterations = 10;
+    public static long problemOne(){
+        int iterations = 40;
         HashMap<String, String> templates = getTemplates(); // example : NN -> C
-        HashMap<String,Integer> pairCounter = generateInputPairs(); // convert input, ex. NNCB to [NN -> 1, NC -> 1, CB -> 1] 
+        HashMap<String,Long> pairCounter = generateInputPairs(); // convert input, ex. NNCB to [NN -> 1, NC -> 1, CB -> 1] 
         for(int i = 0; i < iterations; i++){ // run for iterations steps
-            HashMap<String, Integer> newPairCounter = new HashMap<>(pairCounter);
+            HashMap<String, Long> newPairCounter = new HashMap<>(pairCounter);
 
             //TODO: need to check for all of them not just one
             for(String pair: pairCounter.keySet()){
@@ -23,32 +24,32 @@ public class Solution {
                     String left = pair.charAt(0) + templates.get(pair);
                     String right = templates.get(pair) + pair.charAt(1);
                     // put in both the new pairs
-                    newPairCounter.put(left, newPairCounter.getOrDefault(left, 0) + pairCounter.get(pair)); 
-                    newPairCounter.put(right, newPairCounter.getOrDefault(right, 0) + pairCounter.get(pair)); 
+                    newPairCounter.put(left, newPairCounter.getOrDefault(left, 0L) + pairCounter.get(pair)); 
+                    newPairCounter.put(right, newPairCounter.getOrDefault(right, 0L) + pairCounter.get(pair)); 
                 }
             }
             pairCounter = newPairCounter;
         }
         System.out.println(pairCounter);
-        int[] counter = new int[26];
+        long[] counter = new long[26];
         String firstLine = parseInputToArray().get(0);
         counter[firstLine.charAt(firstLine.length() - 1) - 65]++;
         for(String key: pairCounter.keySet()){
             counter[key.charAt(0) - 65] += pairCounter.get(key);
         }
-        return IntStream.of(counter).max().getAsInt() - IntStream.of(counter).filter(x -> x != 0).min().getAsInt();
+        return LongStream.of(counter).max().getAsLong() - LongStream.of(counter).filter(x -> x != 0).min().getAsLong();
     }
     
     public static int problemTwo(){
         return 0;
     }
 
-    public static HashMap<String, Integer> generateInputPairs(){
+    public static HashMap<String, Long> generateInputPairs(){
         String starting = parseInputToArray().get(0);
-        HashMap<String, Integer> pairCounter = new HashMap<>();
+        HashMap<String, Long> pairCounter = new HashMap<>();
         for(int i = 0; i < starting.length() - 1; i++){
             String pair = starting.charAt(i) + "" + starting.charAt(i+1);
-            pairCounter.put(pair, pairCounter.getOrDefault(pair, 0) + 1);
+            pairCounter.put(pair, pairCounter.getOrDefault(pair, 0L) + 1);
         }
         return pairCounter;
     }
@@ -69,7 +70,7 @@ public class Solution {
     }
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
