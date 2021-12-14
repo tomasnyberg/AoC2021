@@ -78,7 +78,7 @@ public class Solution {
                 if(j % 5 == 0 && j != 0){
                     System.out.print("   ");
                 }
-                System.out.print(matrix[i][j] == 1 ? "X":" ");
+                System.out.print(matrix[i][j] == 1 ? (char) 0x2588 + "":" ");
             }
             System.out.println();
         }
