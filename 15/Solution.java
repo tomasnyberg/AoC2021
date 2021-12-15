@@ -34,15 +34,59 @@ public class Solution {
             fill(row, col - 1, matrix, dp, currCost);
         }   
     }
-    // 2850 too high
-    public static int problemTwo(){
-        int[][] bigMatrix = biggerMatrix();
-        int[][] dp = new int[bigMatrix.length][bigMatrix[0].length];
+
+    public static int[][] dijkstra(int[][] matrix){
+        int[][] dp = new int[matrix.length][matrix[0].length];
         for(var xs: dp){
             Arrays.fill(xs, Integer.MAX_VALUE);
         }
-        fill(0,0, bigMatrix, dp, 0);
-        return dp[dp.length -1][dp[0].length -1] - bigMatrix[0][0];
+        dp[0][0] = 0;
+        int[][] visited = new int[matrix.length][matrix[0].length];
+        // pq that sorts according to the shortest paths
+        PriorityQueue<Integer[]> pq = new PriorityQueue<>((a,b) -> dp[a[0]][a[1]] - dp[b[0]][b[1]]);
+        Integer[] topLeft = {0,0};
+        pq.add(topLeft);
+        while(!pq.isEmpty()){
+            Integer[] currPos = pq.poll();
+            int row = currPos[0];
+            int col = currPos[1];
+            if(row > 0 && visited[row-1][col] != 1){
+                if(dp[row-1][col] > dp[row][col] + matrix[row-1][col]){
+                    Integer[] newPos = {row-1, col};
+                    dp[row-1][col] = dp[row][col] + matrix[row-1][col];
+                    pq.add(newPos);
+                }
+            }
+            if(row < matrix.length-1 && visited[row+1][col] != 1){
+                if(dp[row+1][col] > dp[row][col] + matrix[row+1][col]){
+                    Integer[] newPos = {row+1, col};
+                    dp[row+1][col] = dp[row][col] + matrix[row+1][col];
+                    pq.add(newPos);
+                }
+            }
+            if(col > 0 && visited[row][col] != 1){
+                if(dp[row][col-1] > dp[row][col] + matrix[row][col-1]){
+                    Integer[] newPos = {row, col-1};
+                    dp[row][col-1] = dp[row][col] + matrix[row][col-1];
+                    pq.add(newPos);
+                }
+            }
+            if(col < matrix[0].length-1 && visited[row][col + 1] != 1){
+                if(dp[row][col+1] > dp[row][col] + matrix[row][col+1]){
+                    Integer[] newPos = {row, col+1};
+                    dp[row][col+1] = dp[row][col] + matrix[row][col+1];
+                    pq.add(newPos);
+                }
+            }
+            visited[row][col] = 1;
+        }
+        return dp;
+    }
+    
+    public static int problemTwo(){
+        int[][] bigMatrix = biggerMatrix();
+        int[][] dp = dijkstra(bigMatrix);
+        return dp[dp.length -1][dp[0].length -1];
     }
 
     public static int[][] parseToMatrix(){
@@ -72,7 +116,7 @@ public class Solution {
 
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
