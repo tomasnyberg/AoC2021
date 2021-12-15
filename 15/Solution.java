@@ -4,44 +4,25 @@ import java.util.*;
 
 public class Solution {
     public static void main(String[] args){
+        long start = System.currentTimeMillis();
         System.out.println(problemOne());
         System.out.println(problemTwo());
+        System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
     public static int problemOne(){
         int[][] matrix = parseToMatrix();
-        int[][] dp = new int[matrix.length][matrix[0].length];
-        for(var xs: dp){
-            Arrays.fill(xs, Integer.MAX_VALUE);
-        }
-        fill(0,0, matrix, dp, 0);
-        return dp[dp.length -1][dp[0].length -1] - matrix[0][0];
-    }
-
-    public static void fill(int row, int col, int[][] matrix, int[][] dp, int path){
-        // OOB check
-        if(row < 0 || col < 0 || row >= matrix.length || col >= matrix[0].length){
-            return;
-        }
-        int currCost = path + matrix[row][col];
-        if(currCost > dp[row][col]){
-            return;
-        }
-        if(dp[row][col] > currCost){
-            dp[row][col] = currCost;
-            fill(row + 1, col, matrix, dp, currCost);
-            fill(row, col + 1, matrix, dp, currCost);
-            fill(row, col - 1, matrix, dp, currCost);
-        }   
+        return dijkstra(matrix)[matrix.length - 1][matrix[0].length - 1];
     }
 
     public static int[][] dijkstra(int[][] matrix){
         int[][] dp = new int[matrix.length][matrix[0].length];
+        int[][] visited = new int[matrix.length][matrix[0].length];
+        int[][] dirs = {{0,1}, {1,0}, {0, -1}, {-1, 0}};
         for(var xs: dp){
             Arrays.fill(xs, Integer.MAX_VALUE);
         }
         dp[0][0] = 0;
-        int[][] visited = new int[matrix.length][matrix[0].length];
         // pq that sorts according to the shortest paths
         PriorityQueue<Integer[]> pq = new PriorityQueue<>((a,b) -> dp[a[0]][a[1]] - dp[b[0]][b[1]]);
         Integer[] topLeft = {0,0};
@@ -50,43 +31,30 @@ public class Solution {
             Integer[] currPos = pq.poll();
             int row = currPos[0];
             int col = currPos[1];
-            if(row > 0 && visited[row-1][col] != 1){
-                if(dp[row-1][col] > dp[row][col] + matrix[row-1][col]){
-                    Integer[] newPos = {row-1, col};
-                    dp[row-1][col] = dp[row][col] + matrix[row-1][col];
-                    pq.add(newPos);
-                }
-            }
-            if(row < matrix.length-1 && visited[row+1][col] != 1){
-                if(dp[row+1][col] > dp[row][col] + matrix[row+1][col]){
-                    Integer[] newPos = {row+1, col};
-                    dp[row+1][col] = dp[row][col] + matrix[row+1][col];
-                    pq.add(newPos);
-                }
-            }
-            if(col > 0 && visited[row][col] != 1){
-                if(dp[row][col-1] > dp[row][col] + matrix[row][col-1]){
-                    Integer[] newPos = {row, col-1};
-                    dp[row][col-1] = dp[row][col] + matrix[row][col-1];
-                    pq.add(newPos);
-                }
-            }
-            if(col < matrix[0].length-1 && visited[row][col + 1] != 1){
-                if(dp[row][col+1] > dp[row][col] + matrix[row][col+1]){
-                    Integer[] newPos = {row, col+1};
-                    dp[row][col+1] = dp[row][col] + matrix[row][col+1];
-                    pq.add(newPos);
+            //Check every direction
+            for(var dir: dirs){
+                int newRow = row + dir[0];
+                int newCol = col + dir[1];
+                //Inbounds check
+                if(newRow >= 0 && newRow < matrix.length && newCol >= 0 && newCol < matrix[0].length){
+                    int thisWay = dp[row][col] + matrix[newRow][newCol];
+                    //If the current way to get to position (newRow, newCol) is greater than going this way,
+                    //update it to use thisway instead
+                    if(dp[newRow][newCol] > thisWay){
+                        Integer[] newPos = {newRow, newCol};
+                        dp[newRow][newCol] = thisWay;
+                        pq.add(newPos);
+                    }
                 }
             }
             visited[row][col] = 1;
         }
         return dp;
     }
-    
+
     public static int problemTwo(){
         int[][] bigMatrix = biggerMatrix();
-        int[][] dp = dijkstra(bigMatrix);
-        return dp[dp.length -1][dp[0].length -1];
+        return dijkstra(bigMatrix)[bigMatrix.length -1][bigMatrix[0].length -1];
     }
 
     public static int[][] parseToMatrix(){

@@ -4,8 +4,10 @@ import java.util.*;
 
 public class Solution {
     public static void main(String[] args){
+        long start = System.currentTimeMillis();
         System.out.println(problemOne());
         System.out.println(problemTwo());
+        System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
     public static int problemOne(){
