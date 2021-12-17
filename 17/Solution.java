@@ -11,7 +11,6 @@ public class Solution {
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
-    //4950 too low
     public static int problemOne(){
         int[] coords = generateCoords();
         System.out.println(Arrays.toString(coords));

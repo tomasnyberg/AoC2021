@@ -11,72 +11,46 @@ public class Solution {
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
+    // lentype 0 seems to be working
     public static int problemOne(){
-        int versionSum = 0;
-        int i = 0;
         // String longBinaryString = hexToBinary(parseInputToArray().get(0));
-        String longBinaryString = "11101110000000001101010000001100100000100011000001100000";
-        while(i < longBinaryString.length()){
-            String currVersion = longBinaryString.substring(i, i + 3);
-            String currType = longBinaryString.substring(i + 3, i + 6);
-            // Parse for literal values works now, going to extract to function that gives the length of them
-            if(Integer.parseInt(currType, 2) == 4){ 
-                int[] litres = parseLiteral(longBinaryString.substring(i)); // skip over the length of the whole literal value
-                versionSum += litres[2];
-                i += litres[0];
-            } else { // Else we have an operator packet
-                int[] res = parseOperatorPacket(longBinaryString.substring(i));
-                i += res[0];
-                versionSum += res[1];
-            }
-        }
-        return versionSum;
+        // longBinaryString = longBinaryString.substring(0, longBinaryString.length()-2);
+        String longBinaryString = "1100000000000001010100000000000000000001011000010001010110100010111000001000000000101111000110000010001101000";
+        int[] totals = parseOperatorPacket(longBinaryString);
+        System.out.println(Arrays.toString(totals));
+        return totals[1];
     }
     
     public static int[] parseOperatorPacket(String binaryString){
         int[] result = new int[3]; // first index length, second versionValue, third result (blank for now)
-        int lenType = binaryString.charAt(7) == '1' ? 1:0;
-        result[1] += Integer.parseInt(binaryString.substring(0, 3)); // add the version value to our sum
-        if(lenType == 0){ // len type where the next 15 bits are 
-            int lenInBits = Integer.parseInt(binaryString.substring(7, 22), 2);
-            result[0] = 22 + lenInBits;
-            int j = 22;
-            while(j < 22 + lenInBits){
-                if(binaryString.substring(j+3, j+6).equals("100")){ // If we have a literal value
-                    int[] lit = parseLiteral(binaryString.substring(j));
-                    j += lit[0]; // Skip over the literal
-                    result[1] += lit[2]; // Increment our versionValue;
-                } else {
-                    int[] op = parseOperatorPacket(binaryString.substring(j));
-                    j += op[0]; // skip the entire length of the operator
-                    result[1] += op[1]; // Add the total versionValue from the nested operator
-                }
-            }
-        } else { // lentype packets
-            int lenInPackets = Integer.parseInt(binaryString.substring(7, 18), 2);
-            int j = 18;
-            result[0] = 18; // need to manually set this unlike above
-            while(j < binaryString.length() && lenInPackets > 0){
-                lenInPackets--;
-                if(binaryString.substring(j+3, j+6).equals("100")){ // If we have a literal value
-                    int[] lit = parseLiteral(binaryString.substring(j));
-                    j += lit[0]; // Skip over the literal
-                    result[0] += lit[0];
-                    result[1] += lit[2]; // Increment our versionValue;
-                } else {
-                    int[] op = parseOperatorPacket(binaryString.substring(j));
-                    j += op[0]; // skip the entire length of the operator
-                    result[0] += op[0];
-                    result[1] += op[1]; // Add the total versionValue from the nested operator
-                }
-            }
+        int lenType = binaryString.charAt(6) == '1' ? 1:0;
+        result[1] += Integer.parseInt(binaryString.substring(0, 3), 2); // add the version value to our sum
+        int lenInBits = 0;
+        int lenInPackets = 0;
+        if(lenType == 0){
+            lenInBits = Integer.parseInt(binaryString.substring(7, 22), 2);   
+        } else {
+            lenInPackets = Integer.parseInt(binaryString.substring(7, 18), 2);
         }
+        int j = lenType == 0 ? 22:18;
+        while(lenInPackets > 0 || (j < 22 + lenInBits && lenInBits != 0)){
+            lenInPackets--;
+            if(binaryString.substring(j+3, j+6).equals("100")){ // If we have a literal value
+                int[] lit = parseLiteral(binaryString.substring(j));
+                j += lit[0]; // Skip over the literal
+                result[1] += lit[2]; // Increment our versionValue;
+            } else {
+                int[] op = parseOperatorPacket(binaryString.substring(j));
+                j += op[0]; // skip the entire length of the operator
+                result[1] += op[1]; // Add the total versionValue from the nested operator
+            }
+        } 
+        result[0] = j;
         return result;
     }
 
 
-    // 111100 11010 11010 11010 01010 00
-
+    // Seems to work
     public static int[] parseLiteral(String binaryString){ 
         // Determines how long a literal is so that we know where the next packet starts
         // Also returns the value of the literal
@@ -96,7 +70,8 @@ public class Solution {
         sum.append(binaryString.substring(i+1, i+5));
         i += 5;
         len += 5;
-        int[] result = {len, Integer.parseInt(sum.toString(), 2), version};
+        int value = Integer.parseInt(sum.toString(), 2);
+        int[] result = {len, value, version};
         return result;
     }
 
