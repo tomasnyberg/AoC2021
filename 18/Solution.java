@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
+import java.util.regex.*;
 
 public class Solution {
     public static void main(String[] args){
@@ -11,12 +12,69 @@ public class Solution {
     }
     
     public static int problemOne(){
-        return 0;
+        ArrayList<String> list = parseInputToArray();
+        String s = list.get(0);
+        for(int i = 1; i < list.size(); i++){
+            s = add(s, list.get(i));
+            s = reduce(s);
+        }
+        System.out.println(s);
+        return wholeMagnitude(s);
     }
 
     public static int problemTwo(){
         return 0;
     }
+
+    public static int wholeMagnitude(String s){
+        while(s.length() >= 5){
+            Matcher m = Pattern.compile("\\[\\d+,\\d+\\]").matcher(s);
+            if(m.find()){
+                String matchString = m.group();
+                int magnitude = magnitude(matchString);
+                System.out.println(s);
+                int startIndex = s.indexOf(matchString);
+                s = s.substring(0, startIndex) + magnitude + s.substring(startIndex + matchString.length());
+            }
+        }
+        return Integer.parseInt(s);
+    }
+
+    public static void testWholeMagnitude(){
+        System.out.println(wholeMagnitude("[[1,2],[[3,4],5]]"));
+    }
+
+    // TODO: currently can't do big numbers (not longs either for that matter)
+    public static int magnitude(String s){
+        int left = 1;
+        int biggerLeft = left;
+        while(Character.isDigit(s.charAt(biggerLeft))){
+            biggerLeft++;
+        }
+        int right = biggerLeft + 1;
+        int biggerRight = right;
+        while(Character.isDigit(s.charAt(biggerRight))){
+            biggerRight++;
+        } 
+        int a = 3*Integer.parseInt(s.substring(left, biggerLeft));
+        int b = 2*Integer.parseInt(s.substring(right, biggerRight));
+        return a+b;
+    }
+
+    public static String reduce(String a){
+        String newA = explode(a);
+        while(!newA.equals(a)){
+            a = newA;
+            newA = explode(a);
+        }
+        newA = split(a);
+        if(!newA.equals(a)){
+            a = newA;
+            a = reduce(a);
+        }
+        return a;
+    }
+
 
     public static String add(String a, String b){
         if(a.isEmpty()){
@@ -29,7 +87,6 @@ public class Solution {
             depth -= a.charAt(i) == ']' ? 1:0; 
             i++;
         } while(depth > 0);
-        System.out.println(i);
         a = "[" + a.substring(0, i) + "," + b + "]";
         return a;
     }
@@ -54,7 +111,7 @@ public class Solution {
                 return a; 
             }
         }
-        return ":("; // incase no explosion
+        return a;
     }
 
     public static String explodeAdder(String a, int i, int left, int right){
@@ -84,17 +141,44 @@ public class Solution {
         }
         return a;
     }
-    // "[[[[,1],2],3],4]"
 
+    // currently not checking for three digit numbers since that feels unlikely
+    public static String split(String a){
+        int i = 0;
+        while(i < a.length() - 1){
+            if(Character.isDigit(a.charAt(i)) && Character.isDigit(a.charAt(i+1))){
+                StringBuilder sb = new StringBuilder();
+                int curr = Integer.parseInt("" + a.charAt(i) + a.charAt(i+1));
+                int left = curr / 2;
+                int right = curr % 2 == 1 ? curr/2+1:curr/2;
+                sb.append("[");
+                sb.append(left);
+                sb.append(",");
+                sb.append(right);
+                sb.append("]");
+                a = a.substring(0, i) + sb.toString() + a.substring(i + 2);
+                break;
+            } else {
+                i++;
+            }
+        }
+        return a;
+    }
+
+    // Seems to work??
+    public static void testSplit(){
+        System.out.println(split("[[[[0,7],4],[15,[0,13]]],[1,1]]"));
+        System.out.println(split("[[[[0,7],4],[[7,8],[0,13]]],[1,1]]"));
+    }
 
     // Seems to be working?
     public static void testExplode(){
-        System.out.println(explode("[[[[[9,8],1],2],3],4]")); // [9,8] expected
-        System.out.println(explode("[7,[6,[5,[4,[3,2]]]]]")); // [3,2] expected
-        System.out.println(explode("[[[[0,7],4],[7,[[8,4],9]]],[1,1]]")); // [3,2] expected
-        System.out.println(explode("[[6,[5,[4,[3,2]]]],1]")); // [3,2]
-        System.out.println(explode("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]")); // [7,3]
-        System.out.println(explode("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")); // [3,2]
+        System.out.println(explode("[[[[[9,8],1],2],3],4]")); 
+        System.out.println(explode("[7,[6,[5,[4,[3,2]]]]]")); 
+        System.out.println(explode("[[[[0,7],4],[7,[[8,4],9]]],[1,1]]")); 
+        System.out.println(explode("[[6,[5,[4,[3,2]]]],1]")); 
+        System.out.println(explode("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]")); 
+        System.out.println(explode("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]"));
     }
 
     // Seems to be working??
