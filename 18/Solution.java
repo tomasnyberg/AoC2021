@@ -23,7 +23,19 @@ public class Solution {
     }
 
     public static int problemTwo(){
-        return 0;
+        int biggest = 0;
+        ArrayList<String> list = parseInputToArray();
+        for(int i = 0; i < list.size(); i++){
+            for(int j = 0; j < list.size(); j++){
+                if(i != j){
+                    int ab = wholeMagnitude(reduce(add(list.get(i), list.get(j))));
+                    int ba = wholeMagnitude(reduce(add(list.get(j), list.get(i))));
+                    biggest = Math.max(ab, biggest);
+                    biggest = Math.max(ba, biggest);
+                }
+            }
+        }
+        return biggest;
     }
 
     public static int wholeMagnitude(String s){
@@ -32,7 +44,7 @@ public class Solution {
             if(m.find()){
                 String matchString = m.group();
                 int magnitude = magnitude(matchString);
-                System.out.println(s);
+                // System.out.println(s);
                 int startIndex = s.indexOf(matchString);
                 s = s.substring(0, startIndex) + magnitude + s.substring(startIndex + matchString.length());
             }
