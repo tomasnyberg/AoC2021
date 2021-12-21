@@ -17,20 +17,56 @@ public class Solution {
         String template = parseInputToArray().get(0);
         char[][] smallMatrix = getInitialMatrix();
         char[][] bigMatrix = new char[1000][1000];
-        //copy the elements from initial array
+        for(var xs: bigMatrix){
+            Arrays.fill(xs, '.');
+        }
+        //copy the elements from initial array WORKS (or at least gets all of the hashtags)
         for(int i = 500; i < 500 + smallMatrix.length; i++){
             for(int j = 500; j < 500 + smallMatrix[0].length; j++){
                 bigMatrix[i][j] = smallMatrix[i-500][j-500];
             }
         }
-        bigMatrix = stepMatrix(bigMatrix, template);
+        bigMatrix = stepMatrix(bigMatrix, template, 2);
+        return countHashTags(bigMatrix);
     }
 
-    public static char[][] stepMatrix(char[][] matrix, String template){
-        
+    public static char[][] stepMatrix(char[][] matrix, String template, int steps){
+        for(int step = 0; step < steps; step++){
+            char[][] newMatrix = new char[matrix.length][matrix[0].length];
+            for(var xs: newMatrix){
+                Arrays.fill(xs, step % 2 == 1 ? '#':'.');
+            }
+            // the inner array 
+            for(int i = 500-step; i < 600 + step; i++){
+                for(int j = 500-step; j < 600+step; j++){
+                    newMatrix[i][j] = matrix[i][j];
+                }
+            }
+            for(int i = 0; i < newMatrix.length; i++){
+                for(int j = 0; j < newMatrix[0].length; j++){
+                    newMatrix[i][j] = calculateIndex(matrix, i, j, step, template);
+                }
+            }
+            matrix = newMatrix;
+        }
+        return matrix;
     }
 
-    public static 
+    public static char calculateIndex(char[][] matrix, int row, int col, int step, String template){
+        String res = "";
+        for(int i = -1; i <= 1; i++){
+            for(int j = -1; j <= 1; j++){
+                int nrow = row + i;
+                int ncol = col + j;
+                if(nrow >= 0 && ncol >= 0 && nrow < matrix.length && ncol < matrix[0].length){
+                    res += matrix[nrow][ncol] == '#' ? '1':'0';
+                } else {
+                    res += step % 2 == 1 ? '1':'0';
+                }
+            }
+        }
+        return template.charAt(Integer.parseInt(res, 2));
+    }
 
 
     public static int problemTwo(){
@@ -65,7 +101,7 @@ public class Solution {
     public static ArrayList<String> parseInputToArray(){
         try {
             // input 1 changed first character in template
-            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
