@@ -101,21 +101,6 @@ public class Solution {
         return Integer.parseInt(res, 2);
     }
 
-    public static boolean anyAdjacent(char[][] matrix, int row, int col){
-        for(int i = -1; i <= 1; i++){
-            for(int j = -1; j <= 1; j++){
-                int nrow = row + i;
-                int ncol = col + j;
-                if(nrow >= 0 && ncol >= 0 && nrow < matrix.length && ncol < matrix[0].length){
-                    if(matrix[nrow][ncol] == '#'){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     public static char[][] getInitialMatrix(){
         ArrayList<String> list = parseInputToArray();
         String l = list.get(2);
