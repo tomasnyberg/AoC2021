@@ -51,26 +51,20 @@ public class Solution {
         return pos; 
     }
 
-    // 911090395997650 too low
-    // Idea: keep a memo map with strings as keys that contains every single combination of positions and steps
-    // The value is 1 for player 1 win, 0 for player 2 win, so we simply sum all the entries and count the 1s
     public static long problemTwo(){
-        int[] pos = startPos();
-        Long[] ans = recur(pos[0]-1, pos[1]-1, 0, 0, new HashMap<>());
-        System.out.println(Arrays.toString(ans));
+        int[] result = {0, 0};
+        Long[] ans = recur(startPos(), result, new HashMap<>());
         return Math.max(ans[0], ans[1]); 
     }
 
-    
-    //No return value since the result is simply the sum of all memo
 
-    public static Long[] recur(int p1, int p2, int s1, int s2, HashMap<String, Long[]> m){
-        String mString = p1 + " " + p2 + " " + s1 + " " + s2;
-        if(s1 > 20){
+    public static Long[] recur(int[] pos, int[] scores, HashMap<String, Long[]> m){
+        String mString = ""+pos[0] + pos[1] + scores[0] + scores[1];
+        if(scores[0] > 20){
             Long[] result = {1L, 0L};
             return result;
         }
-        if(s2 > 20){
+        if(scores[1] > 20){
             Long[] result = {0L, 1L};
             return result;
         }
@@ -78,13 +72,14 @@ public class Solution {
             return m.get(mString);
         }
         Long[] ans = {0L,0L};
-        for(int d1 = 1; d1 <= 3; d1++){
-            for(int d2 = 1; d2 <= 3; d2++){
-                for(int d3 = 1; d3 <= 3; d3++){
-                    int newP1 = (p1 + d1 + d2 + d3)%10;
-                    int newS1 = s1 + newP1 + 1;
-
-                    Long[] temp = recur(p2, newP1, s2, newS1, m);
+        for(int i = 1; i <= 3; i++){
+            for(int j = 1; j <= 3; j++){
+                for(int k = 1; k <= 3; k++){
+                    int p1next = (pos[0] + i+j+k)%10;
+                    int s1 = scores[0] + p1next + 1;
+                    int[] newPos = {pos[1], p1next};
+                    int[] newScores = {scores[1], s1};
+                    Long[] temp = recur(newPos, newScores, m);
                     ans[0] += temp[1];
                     ans[1] += temp[0];
                 }
@@ -103,8 +98,8 @@ public class Solution {
         int[] result = new int[2];
         String a = list.get(0);
         String b = list.get(1);
-        result[0] = Integer.parseInt(a.charAt(a.length() - 1) + "");
-        result[1] = Integer.parseInt(b.charAt(b.length() - 1) + "");
+        result[0] = Integer.parseInt(a.charAt(a.length() - 1) + "") - 1;
+        result[1] = Integer.parseInt(b.charAt(b.length() - 1) + "") - 1;
         return result;
     }
 
