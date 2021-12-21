@@ -10,9 +10,6 @@ public class Solution {
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
-    // 5685 too high
-    // 5568 too low
-    // 5326 answer for input2
     public static int problemOne(){
         String template = parseInputToArray().get(0);
         char[][] smallMatrix = getInitialMatrix();
@@ -26,7 +23,7 @@ public class Solution {
                 bigMatrix[i][j] = smallMatrix[i-500][j-500];
             }
         }
-        bigMatrix = stepMatrix(bigMatrix, template, 2);
+        bigMatrix = stepMatrix(bigMatrix, template, 50);
         return countHashTags(bigMatrix);
     }
 
