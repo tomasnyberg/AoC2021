@@ -12,93 +12,40 @@ public class Solution {
     
     // 5685 too high
     // 5568 too low
-    //5326 answer for input2
-    // Currently some bug where the edges aren't getting done properly and sometimes get a # for no reason
+    // 5326 answer for input2
     public static int problemOne(){
         String template = parseInputToArray().get(0);
-        char[][] currMatrix = getInitialMatrix();
-        int steps = 2;
-        currMatrix = stepMatrix(currMatrix, template, steps);
-        return countHashTags(currMatrix);
+        char[][] smallMatrix = getInitialMatrix();
+        char[][] bigMatrix = new char[1000][1000];
+        //copy the elements from initial array
+        for(int i = 500; i < 500 + smallMatrix.length; i++){
+            for(int j = 500; j < 500 + smallMatrix[0].length; j++){
+                bigMatrix[i][j] = smallMatrix[i-500][j-500];
+            }
+        }
+        bigMatrix = stepMatrix(bigMatrix, template);
     }
 
-    public static char[][] stepMatrix(char[][] currMatrix, String template, int steps){
-        for(var xs: currMatrix){
-            System.out.println(Arrays.toString(xs));
-        }
-        System.out.println();
-        for(int step = 0; step < steps; step++){
-            char[][] newMatrix = new char[currMatrix.length + 2][currMatrix[0].length + 2];
-            for(var xs: newMatrix){
-                Arrays.fill(xs, '.');
-            }
-            for(int i = 0; i < currMatrix.length; i++){
-                for(int j = 0; j < currMatrix.length; j++){
-                    newMatrix[i + 1][j + 1] = currMatrix[i][j];
-                }
-            }
-            for(var xs: newMatrix){
-                System.out.println(Arrays.toString(xs));
-            }
-            System.out.println();
-            for(int i = -1; i <= currMatrix.length; i++){
-                for(int j = -1; j <= currMatrix[0].length; j++){
-                    newMatrix[i+1][j+1] = template.charAt(calculateIndex(currMatrix, i, j));
-                }
-            }
-            for(var xs: newMatrix){
-                System.out.println(Arrays.toString(xs));
-            }
-            System.out.println();
-            currMatrix = newMatrix;
-        }
-        return currMatrix;
+    public static char[][] stepMatrix(char[][] matrix, String template){
+        
     }
+
+    public static 
+
 
     public static int problemTwo(){
         return 0;
     }
 
-    public static char[][] fillEdges(char[][] newMatrix, char filler){
-        for(int i = 0; i < newMatrix.length; i++){
-            newMatrix[i][0] = filler;
-            newMatrix[i][newMatrix[0].length - 1] = filler;
-        }
-        // Fill left and right columns
-        for(int j = 0; j < newMatrix[0].length; j++){
-            newMatrix[0][j] = filler;
-            newMatrix[newMatrix.length - 1][j] = filler;
-        }
-        for(var xs: newMatrix){
-            System.out.println(Arrays.toString(xs));
-        }
-        return newMatrix;
-    }
 
     public static int countHashTags(char[][] matrix){
         int count = 0;
-        for(int i = 0; i < matrix.length; i++){
-            for(int j = 0; j < matrix[0].length; j++){
-                count += matrix[i][j] == '.' ? 0:1;
+        for(var xs: matrix){
+            for(char c: xs){
+                count += c == '#' ? 1:0;
             }
         }
         return count;
-    }
-
-    public static int calculateIndex(char[][] matrix, int row, int col){
-        String res = "";
-        for(int i = -1; i <= 1; i++){
-            for(int j = -1; j <= 1; j++){
-                int nrow = row + i;
-                int ncol = col + j;
-                if(nrow >= 0 && ncol >= 0 && nrow < matrix.length && ncol < matrix[0].length){
-                    res += matrix[nrow][ncol] == '.' ? '0':'1';
-                } else {
-                    res += '0';
-                }
-            }
-        }
-        return Integer.parseInt(res, 2);
     }
 
     public static char[][] getInitialMatrix(){

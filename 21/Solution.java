@@ -89,10 +89,6 @@ public class Solution {
         return ans;
     }
 
-
-
-    
-
     public static int[] startPos(){
         ArrayList<String> list = parseInputToArray();
         int[] result = new int[2];
