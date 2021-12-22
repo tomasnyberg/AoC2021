@@ -6,7 +6,7 @@ import java.util.regex.*;
 public class Solution {
     public static void main(String[] args){
         long start = System.currentTimeMillis();
-        // System.out.println(problemOne());
+        System.out.println(problemOne());
         System.out.println(problemTwo());
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
@@ -42,33 +42,39 @@ public class Solution {
 
     
     public static long problemTwo(){
-        ArrayList<Integer[]> intervals = getIntervals2(true);
-        int len = intervals.size();
-        for(int i = 0; i < len; i++){
-            for(int j = i - 1; j >= 0; j--){
-                Integer[] b = intervals.get(i);
-                Integer[] a = intervals.get(j);
-                Integer[] intersect = generateIntersection(a, b);
-                if(intersect != null){
-                    //Current cube is an on cube
-                    if(b[6] == 1){
-                        intervals.add(intersect);
-                    } else {
-                        if(a[6] == 1){
-                            intersect[6] = -1;
-                            intervals.add(intersect);
-                        }
+        ArrayList<Integer[]> intervals = getIntervals(true);
+        ArrayList<Integer[]> newIntervals = new ArrayList<>();
+        for(var fromInitial: intervals){
+            ArrayList<Integer[]> toAdd = new ArrayList<>();
+            if(fromInitial[6] == 1){
+                for(var fromAdded: newIntervals){
+                    Integer[] intersection = generateIntersection(fromAdded, fromInitial);
+                    if(intersection != null){
+                        toAdd.add(intersection);
                     }
                 }
+                toAdd.add(fromInitial);
+            } else if(fromInitial[6] == -1){
+                for(var fromAdded: newIntervals){
+                    Integer[] intersection = generateIntersection(fromAdded, fromInitial);
+                    if(intersection != null){
+                        toAdd.add(intersection);
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException("This one doesn't have proper sign:" + Arrays.toString(fromInitial));
             }
+            for(var xs: toAdd){
+                newIntervals.add(xs);
+            }
+            toAdd.clear();
         }
         long sum = 0;
-        for(var xs: intervals){
-            System.out.println(Arrays.toString(xs));
+        for(var xs: newIntervals){
             if(xs[6] == 1){
-                sum += (xs[1] - xs[0] + 1) * (xs[3] - xs[2] + 1) * (xs[5] - xs[4] + 1); 
-            } else {
-                sum -= (xs[1] - xs[0] + 1) * (xs[3] - xs[2] + 1) * (xs[5] - xs[4] + 1); 
+                sum += (long) (xs[1] - xs[0] + 1) * (long) (xs[3] - xs[2] + 1) * (long) (xs[5] - xs[4] + 1); 
+            } else if(xs[6] == -1) {
+                sum -= (long) (xs[1] - xs[0] + 1) * (long) (xs[3] - xs[2] + 1) * (long) (xs[5] - xs[4] + 1); 
             }
         }
         return sum;
@@ -82,21 +88,24 @@ public class Solution {
         int z0 = Math.max(a[4], b[4]);
         int z1 = Math.min(a[5], b[5]);
         if(x0 <= x1 && y0 <= y1 && z0 <= z1){
-            Integer[] result = {x0, x1, y0, y1, z0, z1, -b[6]};
+            Integer[] result = {x0, x1, y0, y1, z0, z1, -a[6]};
             return result;
         } else {
             return null;
         }
     }
 
+    // Function for testing solution, expected sum of area here is 39
     public static ArrayList<Integer[]> getIntervals2(boolean big){
         ArrayList<Integer[]> result = new ArrayList<>();
         Integer[] a = {10, 12,10,12,10,12, 1};
         Integer[] b = {11, 13, 11,13,11,13, 1};
         Integer[] c = {9,11,9,11,9,11,-1};
+        Integer[] d = {10,10,10,10,10,10, 1};
         result.add(a);
         result.add(b);
         result.add(c);
+        result.add(d);
         return result;
     }
 
@@ -127,7 +136,7 @@ public class Solution {
 
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
