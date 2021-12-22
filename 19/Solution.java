@@ -11,10 +11,7 @@ public class Solution {
     }
     
     public static int problemOne(){
-        int[][] rots = rotations();
-        for(var xs: rots){
-            System.out.println(Arrays.toString(xs));
-        }
+        
         return 0;
     }
 
@@ -32,21 +29,6 @@ public class Solution {
         result[1] = x*rot[1] + y*rot[4] + z*rot[7];
         result[2] = x*rot[2] + y*rot[5] + z*rot[8];
         return result;
-    }
-
-
-    public int partition(int[] xs, int left, int right){
-        int pivot = xs[right];
-        int i = left - 1;
-        for(int j = left; j < right; j++){
-            if(xs[j] <= pivot){
-                i++;
-                swap(i,j);
-            }
-        }
-        i++;
-        swap(i, right);
-        return i;
     }
 
     public static int[][] rotations(){
@@ -78,6 +60,10 @@ public class Solution {
             xs[a] = 0;
         }
         return result;
+    }
+
+    public static HashMap<Integer, Integer[][][]> generateScanners(){
+        
     }
 
     public static ArrayList<String> parseInputToArray(){

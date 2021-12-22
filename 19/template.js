@@ -43,12 +43,21 @@ class Scanner {
     }
 
     //Finds how many of this scanners signals have relative signals that are the same as the other scanners
+
+    /*
+    By establishing 12 common beacons, you can precisely
+    determine where the scanners are relative to each other, 
+    allowing you to reconstruct the beacon map one scanner at a time.
+    */
     compare(scanner) {
         let max = 0
         for (let there of scanner.signals) {
             for (let here of this.signals) {
                 const intersection = there.compare(here)  
                 if (intersection.length >= 11) {
+                    // There = the other scanners signal
+                    // here = This scanners signal
+                    // Intersection = how many relatives these two signals have in common ?? 
                     return {there, here, intersection}
                 }
             }
