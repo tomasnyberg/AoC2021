@@ -11,73 +11,40 @@ public class Solution {
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
-    public static int problemOne(){
-        ArrayList<Integer[]> intervals = getIntervals(false);
-        HashMap<String, Integer> m = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
-        for(var xs: intervals){
-            for(int i = xs[0]; i <= xs[1]; i++){
-                for(int j = xs[2]; j <= xs[3]; j++){
-                    for(int k = xs[4]; k <= xs[5]; k++){
-                        sb.append(i);
-                        sb.append(",");
-                        sb.append(j);
-                        sb.append(",");
-                        sb.append(k);
-                        sb.append(",");
-                        if(xs[6] == 1){
-                            m.put(sb.toString(), 1);
-                        } else {
-                            if(m.containsKey(sb.toString())){
-                                m.remove(sb.toString());
-                            }
-                        }
-                        sb.setLength(0);
-                    }
-                }
-            }
-        }
-        return m.size();
+    public static long problemOne(){
+        return solve(false);
     }
 
     
     public static long problemTwo(){
-        ArrayList<Integer[]> intervals = getIntervals(true);
+        return solve(true);
+    }
+
+    public static long solve(boolean bigNumbers){
+        ArrayList<Integer[]> intervals = getIntervals(bigNumbers);
         ArrayList<Integer[]> newIntervals = new ArrayList<>();
         for(var fromInitial: intervals){
             ArrayList<Integer[]> toAdd = new ArrayList<>();
+            for(var fromAdded: newIntervals){
+                Integer[] intersection = generateIntersection(fromAdded, fromInitial);
+                if(intersection != null){
+                    toAdd.add(intersection);
+                }
+            }
             if(fromInitial[6] == 1){
-                for(var fromAdded: newIntervals){
-                    Integer[] intersection = generateIntersection(fromAdded, fromInitial);
-                    if(intersection != null){
-                        toAdd.add(intersection);
-                    }
-                }
                 toAdd.add(fromInitial);
-            } else if(fromInitial[6] == -1){
-                for(var fromAdded: newIntervals){
-                    Integer[] intersection = generateIntersection(fromAdded, fromInitial);
-                    if(intersection != null){
-                        toAdd.add(intersection);
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException("This one doesn't have proper sign:" + Arrays.toString(fromInitial));
             }
-            for(var xs: toAdd){
-                newIntervals.add(xs);
-            }
+            newIntervals.addAll(toAdd);
             toAdd.clear();
         }
-        long sum = 0;
-        for(var xs: newIntervals){
-            if(xs[6] == 1){
-                sum += (long) (xs[1] - xs[0] + 1) * (long) (xs[3] - xs[2] + 1) * (long) (xs[5] - xs[4] + 1); 
-            } else if(xs[6] == -1) {
-                sum -= (long) (xs[1] - xs[0] + 1) * (long) (xs[3] - xs[2] + 1) * (long) (xs[5] - xs[4] + 1); 
-            }
-        }
-        return sum;
+        return calculateArea(newIntervals);
+    }
+
+    public static long calculateArea(ArrayList<Integer[]> intervals) {
+        return intervals
+            .stream().
+            mapToLong(xs -> (long) (xs[1] - xs[0] + 1) * (xs[3] - xs[2] + 1) * (xs[5] - xs[4] + 1) * xs[6])
+            .sum();
     }
 
     public static Integer[] generateIntersection(Integer[] a, Integer[] b){
