@@ -4,7 +4,8 @@ import java.util.*;
 
 public class Solution {
     public static String finished = "[█, █, █, █, █, █, █, █, █, █, █, █, █][█, ., ., ., ., ., ., ., ., ., ., ., █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, █, █, █, █, █, █, █, █, █, █]";
-    public static int total;
+    public static int smallest = Integer.MAX_VALUE;
+    public static Map<Character, Integer> costs = costToMoveChar();
     public static void main(String[] args){
         long start = System.currentTimeMillis();
         System.out.println(problemOne());
@@ -15,6 +16,7 @@ public class Solution {
     public static int problemOne(){
         char[][] map = generateMap();
         HashMap<String, Integer> prevPositions = new HashMap<>();
+        prevPositions.put(mapString(map), 0);
         System.out.println("Initial map state:");
         printMap(map);
         recur(map, prevPositions);
@@ -25,22 +27,24 @@ public class Solution {
         return 0;
     }
 
-    public static int recur(char[][] map, HashMap<String, Integer> prevPositions){
+    public static void recur(char[][] map, HashMap<String, Integer> prevPositions){
+        if(prevPositions.get(mapString(map)) > smallest){
+            return;
+        }
         for(var move: possibleMoves(map)){
             String thismap = mapString(map);
-            int cost = calculateCost(thismap, move) + prevPositions.getOrDefault(thismap, 0);
+            int cost = calculateCost(thismap, move) + prevPositions.get(thismap);
             if(prevPositions.containsKey(move)){
                 if(prevPositions.get(move) < cost){
                     continue;
                 }
             }
             prevPositions.put(move, cost);
+            if(move.equals(finished)){
+                smallest = cost < smallest ? cost:smallest;
+            }
             recur(mapStringToMap(move), prevPositions);
         }
-        if(mapString(map).equals(finished)){
-            total++;
-        }
-        return total;
     }
 
     public static void testMoveCost(){
@@ -51,7 +55,6 @@ public class Solution {
 
     //Cost of moving from mapstring A to B
     public static int calculateCost(String a, String b){
-        Map<Character, Integer> costs = costToMoveChar();
         char[][] mapA = mapStringToMap(a); 
         char[][] mapB = mapStringToMap(b); 
         int diffidx = 0;
@@ -113,6 +116,7 @@ public class Solution {
         return result;
     }
 
+    // Doesn't work with size 4
     public static Set<String> generateMoves(char[][] map, int moveType, int row, int col){
         char[][] newMap = copyArray(map);
         char curr = map[row][col];
@@ -139,17 +143,11 @@ public class Solution {
                 left--;
             }
             // If we stopped on top of a room, go back one step
-            if(Arrays.asList(3,5,7,9).contains(left)){
-                left++;
-            }
             if(map[1][right] != '.'){
                 right = col;
             }
             while(right < 12 && map[1][right+1] == '.'){
                 right++;
-            }
-            if(Arrays.asList(3,5,7,9).contains(right)){
-                right--;
             }
             for(int i = left; i <= right; i++){
                 if(!Arrays.asList(3,5,7,9).contains(i)){
@@ -310,7 +308,7 @@ public class Solution {
 
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
