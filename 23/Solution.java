@@ -3,6 +3,8 @@ import java.io.FileReader;
 import java.util.*;
 
 public class Solution {
+    public static String finished = "[█, █, █, █, █, █, █, █, █, █, █, █, █][█, ., ., ., ., ., ., ., ., ., ., ., █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, █, █, █, █, █, █, █, █, █, █]";
+    public static int total;
     public static void main(String[] args){
         long start = System.currentTimeMillis();
         System.out.println(problemOne());
@@ -12,19 +14,42 @@ public class Solution {
     
     public static int problemOne(){
         char[][] map = generateMap();
-        HashMap<String, Integer> prevPositions = new HashMap<>();
+        // HashMap<String, Integer> prevPositions = new HashMap<>();
         System.out.println("Initial map state:");
+        // System.out.println("Possible moves: " + possibleMoves(map));
+        HashSet<String> seenPositions = new HashSet<>();
         printMap(map);
-        Set<String> moves = possibleMoves(map);
-        for(String s: moves){
-            printMap(mapStringToMap(s));
-            System.out.println();
-        }
-        return 0;
+        return recur(map, seenPositions);
     }
     
     public static int problemTwo(){
         return 0;
+    }
+
+    public static int recur(char[][] map, HashSet<String> seenPositions){
+        // printMap(map);
+        if(!mapString(map).equals(finished)){
+            seenPositions.add(mapString(map));
+        }
+        for(var move: possibleMoves(map)){
+            if(seenPositions.contains(move)){
+                continue;
+            }
+            recur(mapStringToMap(move), seenPositions);
+        }
+        if(mapString(map).equals(finished)){
+            total++;
+        }
+        return total;
+    }
+
+    public static int calculateCost(){
+        return 0;
+    }
+
+    public static Map<Character, Integer> costToMove(){
+        Map<Character, Integer> result = new HashMap<>();
+        return result;
     }
 
     public static Set<String> possibleMoves(char[][] map){
@@ -40,6 +65,7 @@ public class Solution {
         return result;
     }
 
+    // Have to do this manually since .clone() is buggy 
     public static char[][] copyArray(char[][] map){
         char[][] result = new char[map.length][map[0].length];
         for(int i = 0;i < map.length; i++){
@@ -69,12 +95,18 @@ public class Solution {
         } else { // moveType 0, move out into corridor
             int left = col - 1;
             int right = col + 1;
+            if(map[1][left] != '.'){
+                left = col;
+            }
             while(left > 1 && map[1][left-1] == '.'){
                 left--;
             }
             // If we stopped on top of a room, go back one step
             if(Arrays.asList(3,5,7,9).contains(left)){
                 left++;
+            }
+            if(map[1][right] != '.'){
+                right = col;
             }
             while(right < 12 && map[1][right+1] == '.'){
                 right++;
@@ -98,6 +130,31 @@ public class Solution {
     // 0 = can move out from room into hallway
     // 1 = can move into room
     // Probably works, did some tests
+    // Bug: C here skipped over D which it shouldn't be able to do
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, ., ., ., D, ., ., ., ., ., B, ., █]
+    // [█, █, █, ., █, C, █, B, █, ., █, █, █]
+    // [█, █, █, A, █, D, █, C, █, A, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, ., C, ., D, ., ., ., ., ., B, ., █]
+    // [█, █, █, ., █, ., █, B, █, ., █, █, █]
+    // [█, █, █, A, █, D, █, C, █, A, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+
+
+    // Test: that this doesn't happen, i.e. that c doesn't get a positive canMove
+    // [█, ., ., ., ., ., ., ., ., ., ., ., █]
+    // [█, █, █, A, █, B, █, C, █, ., █, █, █]
+    // [█, █, █, A, █, B, █, C, █, D, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, ., C, ., ., ., ., ., ., ., ., ., █]
+    // [█, █, █, A, █, B, █, ., █, ., █, █, █]
+    // [█, █, █, A, █, B, █, C, █, D, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+    // [█, █, █, █, █, █, █, █, █, █, █, █, █]
     public static int canMove(char[][] map, int row, int col){
         Map<Character, Integer> destinations = finalDestination();
         if(!Character.isLetter(map[row][col])){
