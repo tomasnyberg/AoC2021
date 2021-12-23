@@ -14,29 +14,28 @@ public class Solution {
     
     public static int problemOne(){
         char[][] map = generateMap();
-        // HashMap<String, Integer> prevPositions = new HashMap<>();
-        // System.out.println("Initial map state:");
-        // HashSet<String> seenPositions = new HashSet<>();
-        // System.out.println(mapString(map));
-        // return recur(map, seenPositions);
-        testMoveCost();
-        return 0;
+        HashMap<String, Integer> prevPositions = new HashMap<>();
+        System.out.println("Initial map state:");
+        printMap(map);
+        recur(map, prevPositions);
+        return prevPositions.get(finished);
     }
     
     public static int problemTwo(){
         return 0;
     }
 
-    public static int recur(char[][] map, HashSet<String> seenPositions){
-        printMap(map);
-        if(!mapString(map).equals(finished)){
-            seenPositions.add(mapString(map));
-        }
+    public static int recur(char[][] map, HashMap<String, Integer> prevPositions){
         for(var move: possibleMoves(map)){
-            if(seenPositions.contains(move)){
-                continue;
+            String thismap = mapString(map);
+            int cost = calculateCost(thismap, move) + prevPositions.getOrDefault(thismap, 0);
+            if(prevPositions.containsKey(move)){
+                if(prevPositions.get(move) < cost){
+                    continue;
+                }
             }
-            recur(mapStringToMap(move), seenPositions);
+            prevPositions.put(move, cost);
+            recur(mapStringToMap(move), prevPositions);
         }
         if(mapString(map).equals(finished)){
             total++;
@@ -73,11 +72,11 @@ public class Solution {
         } else {
             toMove = mapA[diff[1][0]][diff[1][1]];
         }
-        System.out.println("Char to move: " + toMove);
-        System.out.println("Diffidx: " + diffidx);
-        for(var xs: diff){
-            System.out.println(Arrays.toString(xs));
-        }
+        // System.out.println("Char to move: " + toMove);
+        // System.out.println("Diffidx: " + diffidx);
+        // for(var xs: diff){
+        //     System.out.println(Arrays.toString(xs));
+        // }
         return costs.get(toMove) * ((int) Math.abs(diff[0][0] - diff[1][0]) + (int) Math.abs(diff[0][1] - diff[1][1]));
     }
 
@@ -311,7 +310,7 @@ public class Solution {
 
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
