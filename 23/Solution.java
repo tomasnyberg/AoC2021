@@ -116,7 +116,7 @@ public class Solution {
         return result;
     }
 
-    // Doesn't work with size 4
+    // moveType 1 doesn't work with size 4
     public static Set<String> generateMoves(char[][] map, int moveType, int row, int col){
         char[][] newMap = copyArray(map);
         char curr = map[row][col];
@@ -124,11 +124,11 @@ public class Solution {
         // Move into room, seems to work
         if(moveType == 1){
             int dest = finalDestination().get(curr);
-            if(map[3][dest] == '.'){
-                newMap[3][dest] = curr;
-            } else { // Move into top row
-                newMap[2][dest] = curr;
+            int newrow = 2;
+            while(map[newrow+1][dest] == '.'){
+                newrow++;
             }
+            newMap[newrow][dest] = curr;
             newMap[row][col] = '.';
             result.add(mapString(newMap));
             newMap = copyArray(map);
@@ -190,6 +190,8 @@ public class Solution {
     // [█, █, █, A, █, B, █, C, █, D, █, █, █]
     // [█, █, █, █, █, █, █, █, █, █, █, █, █]
     // [█, █, █, █, █, █, █, █, █, █, █, █, █]
+
+    // this doesn't work at all with 4 slots
     public static int canMove(char[][] map, int row, int col){
         Map<Character, Integer> destinations = finalDestination();
         if(!Character.isLetter(map[row][col])){
