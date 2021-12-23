@@ -15,11 +15,12 @@ public class Solution {
     public static int problemOne(){
         char[][] map = generateMap();
         // HashMap<String, Integer> prevPositions = new HashMap<>();
-        System.out.println("Initial map state:");
-        // System.out.println("Possible moves: " + possibleMoves(map));
-        HashSet<String> seenPositions = new HashSet<>();
-        printMap(map);
-        return recur(map, seenPositions);
+        // System.out.println("Initial map state:");
+        // HashSet<String> seenPositions = new HashSet<>();
+        // System.out.println(mapString(map));
+        // return recur(map, seenPositions);
+        testMoveCost();
+        return 0;
     }
     
     public static int problemTwo(){
@@ -27,7 +28,7 @@ public class Solution {
     }
 
     public static int recur(char[][] map, HashSet<String> seenPositions){
-        // printMap(map);
+        printMap(map);
         if(!mapString(map).equals(finished)){
             seenPositions.add(mapString(map));
         }
@@ -43,12 +44,49 @@ public class Solution {
         return total;
     }
 
-    public static int calculateCost(){
-        return 0;
+    public static void testMoveCost(){
+        String a = "[█, █, █, █, █, █, █, █, █, █, █, █, █][█, ., ., ., ., ., ., ., ., ., ., ., █][█, █, █, B, █, C, █, B, █, D, █, █, █][█, █, █, A, █, D, █, C, █, A, █, █, █][█, █, █, █, █, █, █, █, █, █, █, █, █]";
+        String b = "[█, █, █, █, █, █, █, █, █, █, █, █, █][█, ., ., ., ., ., ., ., ., ., ., ., █][█, █, █, B, █, C, █, B, █, D, █, █, █][█, █, █, A, █, D, █, C, █, A, █, █, █][█, █, █, █, █, █, █, █, █, █, █, █, █]";
+        System.out.println(calculateCost(a, b));
     }
 
-    public static Map<Character, Integer> costToMove(){
+    //Cost of moving from mapstring A to B
+    public static int calculateCost(String a, String b){
+        Map<Character, Integer> costs = costToMoveChar();
+        char[][] mapA = mapStringToMap(a); 
+        char[][] mapB = mapStringToMap(b); 
+        int diffidx = 0;
+        int[][] diff = new int[2][2];
+        for(int i = 0; i < mapA.length; i++){
+            for(int j = 0; j < mapB[0].length; j++){
+                // Not making an error check here to see if we have found both, letting it crash if something is wrong
+                if(mapA[i][j] != mapB[i][j]){
+                    diff[diffidx][0] = i;
+                    diff[diffidx][1] = j;
+                    diffidx++;
+                }
+            }
+        }
+        char toMove = 'A';
+        if(Character.isLetter(mapA[diff[0][0]][diff[0][1]])){
+            toMove = mapA[diff[0][0]][diff[0][1]];
+        } else {
+            toMove = mapA[diff[1][0]][diff[1][1]];
+        }
+        System.out.println("Char to move: " + toMove);
+        System.out.println("Diffidx: " + diffidx);
+        for(var xs: diff){
+            System.out.println(Arrays.toString(xs));
+        }
+        return costs.get(toMove) * ((int) Math.abs(diff[0][0] - diff[1][0]) + (int) Math.abs(diff[0][1] - diff[1][1]));
+    }
+
+    public static Map<Character, Integer> costToMoveChar(){
         Map<Character, Integer> result = new HashMap<>();
+        result.put('A', 1);
+        result.put('B', 10);
+        result.put('C', 100);
+        result.put('D', 1000);
         return result;
     }
 
