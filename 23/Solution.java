@@ -3,7 +3,7 @@ import java.io.FileReader;
 import java.util.*;
 
 public class Solution {
-    public static String finished = "[█, █, █, █, █, █, █, █, █, █, █, █, █][█, ., ., ., ., ., ., ., ., ., ., ., █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, █, █, █, █, █, █, █, █, █, █]";
+    public static String finished = "[█, █, █, █, █, █, █, █, █, █, █, █, █][█, ., ., ., ., ., ., ., ., ., ., ., █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, A, █, B, █, C, █, D, █, █, █][█, █, █, █, █, █, █, █, █, █, █, █, █]";
     public static int smallest = Integer.MAX_VALUE;
     public static Map<Character, Integer> costs = costToMoveChar();
     public static void main(String[] args){
@@ -270,11 +270,11 @@ public class Solution {
 
     public static char[][] mapStringToMap(String s){
         String[] split = s.split("\\]\\[");
-        char[][] result = new char[5][13];
+        char[][] result = new char[split.length][13];
         int row = 0;
         int col = 0;
         int i = 0;
-        while(row < 5){
+        while(row < split.length){
             char curr = split[row].charAt(i);
             if(Arrays.asList((char) 0x2588, '.', 'A', 'B', 'C', 'D').contains(curr)){
                 result[row][col] = curr;
@@ -315,7 +315,7 @@ public class Solution {
 
     public static char[][] generateMap(){
         ArrayList<String> list = parseInputToArray();
-        char[][] result = new char[5][13];
+        char[][] result = new char[list.size()][13];
         for(var xs: result){
             Arrays.fill(xs, (char) 0x2588);
         }
