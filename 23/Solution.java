@@ -201,7 +201,8 @@ public class Solution {
         if(row == 2 && map[row-1][col-1] == '.' || map[row-1][col+1] == '.'){
             char curr = map[row][col];
             // If both curr and bottom row is correct then don't move
-            if(destinations.get(curr) == col && map[row+1][col] == curr){
+            // very ugly but won't let me change row-1 to a hardcoded 1 for some reason? very weird, doesn't run in that case
+            if(destinations.get(curr) == col && map[row+1][col] == curr && (map.length <= 5 || (map[row+2][col] == curr && map[row+3][col] == curr))){
                 return -1;
             } else {
                 return 0;
@@ -211,6 +212,29 @@ public class Solution {
         if(row == 3 && map[row-1][col] == '.'){
             char curr = map[row][col];
             if(map[row-2][col-1] == '.' || map[row-2][col+1] == '.'){
+                // If we are already in the right spot, then don't move
+                if(destinations.get(curr) == col && (map.length <= 5 || (map[row+1][col] == curr && map[row+2][col] == curr))){
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+
+        if(row == 4 && map[row-1][col] == '.'){
+            char curr = map[row][col];
+            if(map[row-3][col-1] == '.' || map[row-3][col+1] == '.'){
+                // If we are already in the right spot, then don't move
+                if(destinations.get(curr) == col && (map.length <= 5 || map[row+1][col] == curr)){
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+        if(row == 5 && map[row-1][col] == '.'){
+            char curr = map[row][col];
+            if(map[row-4][col-1] == '.' || map[row-4][col+1] == '.'){
                 // If we are already in the right spot, then don't move
                 if(destinations.get(curr) == col){
                     return -1;
@@ -224,17 +248,21 @@ public class Solution {
             char curr = map[row][col];
             int destCol = destinations.get(curr);
             // curr's room is not occupied
-            if(map[3][destCol] == '.' || (map[2][destCol] == '.' && map[3][destCol] == curr)){
-                // Is there a clean path in the hallway to our room?
-                // Tested and should work, but not entirely sure
-                for(int i = Math.min(col, destCol) + 1; i < Math.max(col, destCol); i++){
-                    if(map[1][i] != '.'){
-                        return -1;
-                    }
-                }
-                // Can move into the room from the hallway
-                return 1;
+            int nextRow = 1;
+            while(map[nextRow][destCol] == '.' || map[nextRow][destCol] == curr){
+                nextRow++;
             }
+            if(map[nextRow][destCol] != (char) 0x2588){
+                return -1;
+            }
+            // Is there a clean path in the hallway to our room?
+            for(int i = Math.min(col, destCol) + 1; i < Math.max(col, destCol); i++){
+                if(map[1][i] != '.'){
+                    return -1;
+                }
+            }
+            // Can move into the room from the hallway
+            return 1;
         }
         // Can't move neither out into the hallway nor into our room
         return -1;
