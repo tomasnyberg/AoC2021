@@ -11,7 +11,10 @@ public class Solution {
     }
     
     public static int problemOne(){
-        
+        Signal a = new Signal(0,0,0);
+        Signal b = new Signal(100,100,100);
+        a.align(b);
+        System.out.println(a.relatives);
         return 0;
     }
 
@@ -62,9 +65,6 @@ public class Solution {
         return result;
     }
 
-    public static HashMap<Integer, Integer[][][]> generateScanners(){
-        
-    }
 
     public static ArrayList<String> parseInputToArray(){
         try {
@@ -82,5 +82,44 @@ public class Solution {
             return null;
         }
     }
+}
 
+class Signal {
+    // Maybe should be set?
+    public List<String> relatives = new ArrayList<>();
+    public int x;
+    public int y;
+    public int z;
+    public Signal(int x, int y, int z){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    //Adds the other signal to this signals relatives, by fingerprinting 
+    public void align(Signal other){
+        int dx = (int) Math.abs(other.x - x); 
+        int dy = (int) Math.abs(other.y - y); 
+        int dz = (int) Math.abs(other.z - z);
+        // Not taking sqrt 
+        int dist = dx*dx + dy*dy + dz*dz;
+        StringBuilder sb = new StringBuilder();
+        sb.append(dx);
+        sb.append(",");
+        sb.append(dy);
+        sb.append(",");
+        sb.append(dz);
+        sb.append(",");
+        sb.append(dist);
+        relatives.add(sb.toString());
+    }
+
+    public List<Signal> compare(Signal other){
+        List<Signal> result = new ArrayList<>();
+        for(String s: relatives){
+            if(other.relatives.indexOf(s) != -1){
+                
+            }
+        }
+    }
 }
