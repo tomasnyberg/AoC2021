@@ -47,15 +47,10 @@ public class Solution {
             xvel -= xvel > 0 ? 1:0;
             yvel--;
             highPoint = Math.max(ypos, highPoint); // update the highest point
-            // String posString = "[" + xpos + ","  + ypos + "]";
-            // String velString = "xvel:" + xvel + " yvel: " + yvel;
             if(withinArea(area, xpos, ypos)){
-                // System.out.println("Within area!!!" + " (pos = " + posString + ")");
                 return highPoint;
             } 
-            // System.out.println("Current pos: " + posString + " " + velString);
         }
-        // System.out.println("Below area, not going to hit it anymore");
         return Integer.MIN_VALUE;
     }
     
