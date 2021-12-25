@@ -11,28 +11,14 @@ public class Solution {
     }
     
     public static int problemOne(){
-        List<Integer[][]> boards = generateBoards();
-        List<String> list = parseInputToArray();
-        int[] inputs = Arrays.stream(list.remove(0).split(",")).mapToInt(Integer::parseInt).toArray();
-        for(Integer x: inputs){
-            for(Integer[][] board: boards){
-                for(int i = 0; i < board.length; i++){
-                    for(int j = 0; j < board[0].length; j++){
-                        if(board[i][j] == x){ // Integer so should be fine to do check like this
-                            board[i][j] = -1;
-                        }
-                    }
-                }
-            }
-            Integer[][] bingoBoard = checkBingo(boards);
-            if(bingoBoard != null){
-                return bingoScore(bingoBoard, x);
-            }
-        }
-        return 0;
+        return solve(false);
     }
     
     public static int problemTwo(){
+        return solve(true);
+    }
+
+    public static int solve(boolean second){
         List<Integer[][]> boards = generateBoards();
         List<String> list = parseInputToArray();
         int[] inputs = Arrays.stream(list.remove(0).split(",")).mapToInt(Integer::parseInt).toArray();
@@ -46,17 +32,23 @@ public class Solution {
                     }
                 }
             }
-            if(boards.size() == 1 && multipleCheckBingo(boards).size() == 1){
-                return bingoScore(boards.get(0), x);
-            }
-            for(Integer[][] m: multipleCheckBingo(boards)){
-                boards.remove(m);
-                if(boards.size() == 1){
-                    break;
+            if(second){
+                if(boards.size() == 1 && multipleCheckBingo(boards).size() == 1){
+                    return bingoScore(boards.get(0), x);
+                }
+                for(Integer[][] m: multipleCheckBingo(boards)){
+                    boards.remove(m);
+                    if(boards.size() == 1){
+                        break;
+                    }
+                }
+            } else {
+                Integer[][] bingoBoard = checkBingo(boards);
+                if(bingoBoard != null){
+                    return bingoScore(bingoBoard, x);
                 }
             }
         }
-        System.out.println(boards.size());
         return 0;
     }
     
