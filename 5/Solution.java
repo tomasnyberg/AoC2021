@@ -11,22 +11,16 @@ public class Solution {
     }
     
     public static int problemOne(){
-        ArrayList<String> input = parseInputToArray();
-        int[][] matrix = new int[1000][1000];
-        for(String s: input){
-            int[] coords = new int[4];
-            coords[0] = Integer.parseInt(s.split(" -> ")[0].split(",")[0]);
-            coords[1] = Integer.parseInt(s.split(" -> ")[0].split(",")[1]);
-            coords[2] = Integer.parseInt(s.split(" -> ")[1].split(",")[0]);
-            coords[3] = Integer.parseInt(s.split(" -> ")[1].split(",")[1]);
-            drawLineStraight(matrix, coords[0], coords[1], coords[2], coords[3]);
-        }
-        return calculateOverlap(matrix);
+        return solve(false);
     }
     
     public static int problemTwo(){
+        return solve(true);
+    }
+    
+    public static int solve(boolean second){
         ArrayList<String> input = parseInputToArray();
-        int[][] matrix = new int[1000][1000]; // CHANGEME
+        int[][] matrix = new int[1000][1000]; // No input bigger than this
         for(String s: input){
             int[] coords = new int[4];
             coords[0] = Integer.parseInt(s.split(" -> ")[0].split(",")[0]);
@@ -34,14 +28,12 @@ public class Solution {
             coords[2] = Integer.parseInt(s.split(" -> ")[1].split(",")[0]);
             coords[3] = Integer.parseInt(s.split(" -> ")[1].split(",")[1]);
             drawLineStraight(matrix, coords[0], coords[1], coords[2], coords[3]);
-            drawLineDiagonal(matrix, coords[0], coords[1], coords[2], coords[3]);
+            if(second){
+                drawLineDiagonal(matrix, coords[0], coords[1], coords[2], coords[3]);
+            }
         }
-        // for(int[] xs: matrix){
-        //     System.out.println(Arrays.toString(xs));
-        // }
         return calculateOverlap(matrix);
     }
-
 
     public static void drawLineDiagonal(int[][] matrix, int x1, int y1, int x2, int y2){
         if(x1 == x2 || y1 == y2){
@@ -58,7 +50,6 @@ public class Solution {
             int startx = Math.min(x1, x2);
             int endx = Math.max(x1, x2);
             int starty = Math.max(y1, y2);
-            int endy = Math.min(y1, y2);
             for(int i = 0; i <= endx-startx; i++){
                 matrix[starty - i][startx + i]++;
             }
