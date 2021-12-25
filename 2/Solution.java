@@ -10,28 +10,14 @@ public class Solution {
     }
     
     public static int problemOne(){
-        ArrayList<String[]> list = parseInputToArray();
-        int depth = 0;
-        int horizontal = 0;
-        for(String[] xs: list){
-            String direction = xs[0];
-            int amount = Integer.parseInt(xs[1]);
-            switch(direction){
-                case "forward":
-                    horizontal += amount;
-                    break;
-                case "down":
-                    depth += amount;
-                    break;
-                default:
-                    depth -= amount;
-                    break;
-            }
-        }
-        return depth * horizontal;
+        return solve(false);
     }
     
     public static int problemTwo(){
+        return solve(true);
+    }
+
+    public static int solve(boolean second){
         ArrayList<String[]> list = parseInputToArray();
         int depth = 0;
         int horizontal = 0;
@@ -42,18 +28,29 @@ public class Solution {
             switch(direction){
                 case "forward":
                     horizontal += amount;
-                    depth += aim*amount;
+                    if(second){
+                        depth += aim*amount;
+                    }
                     break;
                 case "down":
-                    aim += amount;
+                    if(second){
+                        aim += amount;
+                    } else {
+                        depth += amount;
+                    }
                     break;
                 default:
-                    aim -= amount;
+                    if(second){
+                        aim -= amount;
+                    } else {
+                        depth -= amount;
+                    }
                     break;
             }
         }
         return depth * horizontal;
     }
+
     public static ArrayList<String[]> parseInputToArray(){
         try {
             BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
