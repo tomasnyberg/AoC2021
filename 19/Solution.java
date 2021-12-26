@@ -11,12 +11,150 @@ public class Solution {
     }
     
     public static int problemOne(){
-        Signal a = new Signal(0,0,0);
-        Signal b = new Signal(100,100,100);
-        a.align(b);
-        System.out.println(a.relatives);
+        List<Scanner> scanners = generateScanners();
+        Scanner s0 = scanners.get(0);
+        s0.x = 0;
+        s0.y = 0;
+        s0.z = 0;
+        s0.foundLocation = true;
+        Scanner s1 = scanners.get(1);
+        Scanner s2 = scanners.get(2);
+        Scanner s3 = scanners.get(3);
+        Scanner s4 = scanners.get(4);
+        for(int i = 0; i < scanners.size(); i++){
+            for(int j = 0; j < scanners.size(); j++){
+                if(i != j){
+                    if((scanners.get(i).foundLocation || scanners.get(j).foundLocation) && !(scanners.get(i).foundLocation && scanners.get(j).foundLocation)){
+                        System.out.println("Aligning scanners " + i + "and " + j);
+                        alignTwoScanners(scanners.get(i), scanners.get(j));
+                    }
+                }
+            }
+        }
+        // alignTwoScanners(s0, s1);
+
+        // for(Signal sig1: s1.signals){
+        //     for(Signal sig2: s2.signals){
+        //         List<String> common = sig1.compare(sig2);
+        //         if(common.size() >= 11){
+        //             List<int[]> coordsOne = new ArrayList<>();
+        //             List<int[]> coordsTwo = new ArrayList<>();
+        //             for(String s: common){
+        //                 int indexInSig1 = sig1.relatives.indexOf(s);
+        //                 int indexInSig2 = sig2.relatives.indexOf(s);
+        //                 Signal first = s1.signals.get(indexInSig1);
+        //                 Signal second = s2.signals.get(indexInSig2);
+        //                 int[] xs  = {first.x, first.y, first.z};
+        //                 int[] ys  = {second.x, second.y, second.z};
+        //                 coordsOne.add(xs);
+        //                 coordsTwo.add(ys);
+        //             }
+        //             int[][] rotations = rotations();
+        //             for(int[] rotation: rotations){
+        //                 List<int[]> coordsTwoRotated = new ArrayList<>();
+        //                 for(int[] coord: coordsTwo){
+        //                     coordsTwoRotated.add(matrixMul(coord, rotation));
+        //                 }
+        //                 int diffX = coordsOne.get(0)[0] - coordsTwoRotated.get(0)[0];
+        //                 int diffY = coordsOne.get(0)[1] - coordsTwoRotated.get(0)[1];
+        //                 int diffZ = coordsOne.get(0)[2] - coordsTwoRotated.get(0)[2];
+        //                 boolean allCorrect = true;
+        //                 for(int i = 0; i < coordsOne.size(); i++){
+        //                     int[] first = coordsOne.get(i);
+        //                     int[] second = coordsTwoRotated.get(i);
+        //                     int diffXnew = first[0] - second[0];
+        //                     int diffYnew = first[1] - second[1];
+        //                     int diffZnew = first[2] - second[2];
+        //                     if(diffX != diffXnew || diffY != diffYnew || diffZnew != diffZ){
+        //                         allCorrect = false;
+        //                         break;
+        //                     }
+        //                 }
+        //                 if(allCorrect){
+        //                     System.out.println("Distance between the two scanners: " + diffX + ", " + diffY + ", " + diffZ);
+        //                     if(s1.foundLocation){
+        //                         s2.x = s1.x +diffX;
+        //                         s2.y = s1.y + diffY;
+        //                         s2.z = s1.y + diffZ;
+        //                     } else if (s2.foundLocation){
+        //                         s1.x = s2.x + diffX;
+        //                         s1.y = s2.y + diffY;
+        //                         s1.z = s2.z + diffZ;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        // System.out.println("Scanner 1 : "  + s1);
+        // System.out.println("Scanner 2 : "  + s2);
         return 0;
     }
+
+    public static boolean alignTwoScanners(Scanner s1, Scanner s2){
+        for(Signal sig1: s1.signals){
+            for(Signal sig2: s2.signals){
+                List<String> common = sig1.compare(sig2);
+                if(common.size() >= 11){
+                    List<int[]> coordsOne = new ArrayList<>();
+                    List<int[]> coordsTwo = new ArrayList<>();
+                    for(String s: common){
+                        int indexInSig1 = sig1.relatives.indexOf(s);
+                        int indexInSig2 = sig2.relatives.indexOf(s);
+                        Signal first = s1.signals.get(indexInSig1);
+                        Signal second = s2.signals.get(indexInSig2);
+                        int[] xs  = {first.x, first.y, first.z};
+                        int[] ys  = {second.x, second.y, second.z};
+                        coordsOne.add(xs);
+                        coordsTwo.add(ys);
+                    }
+                    int[][] rotations = rotations();
+                    for(int[] rotation: rotations){
+                        List<int[]> coordsTwoRotated = new ArrayList<>();
+                        for(int[] coord: coordsTwo){
+                            coordsTwoRotated.add(matrixMul(coord, rotation));
+                        }
+                        int diffX = coordsOne.get(0)[0] - coordsTwoRotated.get(0)[0];
+                        int diffY = coordsOne.get(0)[1] - coordsTwoRotated.get(0)[1];
+                        int diffZ = coordsOne.get(0)[2] - coordsTwoRotated.get(0)[2];
+                        boolean allCorrect = true;
+                        for(int i = 0; i < coordsOne.size(); i++){
+                            int[] first = coordsOne.get(i);
+                            int[] second = coordsTwoRotated.get(i);
+                            int diffXnew = first[0] - second[0];
+                            int diffYnew = first[1] - second[1];
+                            int diffZnew = first[2] - second[2];
+                            if(diffX != diffXnew || diffY != diffYnew || diffZnew != diffZ){
+                                allCorrect = false;
+                                break;
+                            }
+                        }
+                        if(allCorrect){
+                            System.out.println("Distance between the two scanners: " + diffX + ", " + diffY + ", " + diffZ);
+                            if(s1.foundLocation){
+                                s2.x = s1.x +diffX;
+                                s2.y = s1.y + diffY;
+                                s2.z = s1.y + diffZ;
+                                s2.foundLocation = true;
+                            } else if (s2.foundLocation){
+                                s1.x = s2.x + diffX;
+                                s1.y = s2.y + diffY;
+                                s1.z = s2.z + diffZ;
+                                s2.foundLocation = true;
+                            }
+                        }
+                    }
+                    System.out.println("Scanner 1 : "  + s1);
+                    System.out.println("Scanner 2 : "  + s2);
+                    return true;
+                }
+            }
+        }
+        System.out.println("couldn't align");
+        return false;
+    }
+
+
 
     public static int problemTwo(){
         return 0;
@@ -65,10 +203,31 @@ public class Solution {
         return result;
     }
 
+    public static List<Scanner> generateScanners(){
+        ArrayList<String> list = parseInputToArray();
+        List<Scanner> result = new ArrayList<>();
+        Scanner currScan = null;
+        int idx = 0;
+        for(String s: list){
+            if(s.isEmpty()){
+                idx = 0;
+                continue;
+            }
+            if(s.startsWith("---")){
+                currScan = new Scanner();
+                result.add(currScan);
+            } else {
+                // System.out.println("Adding scanner: " + s + " at idx: " + idx);
+                currScan.addSignal(s, idx++);
+            }
+        }
+        return result;
+    }
+
 
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
@@ -85,15 +244,17 @@ public class Solution {
 }
 
 class Signal {
-    // Maybe should be set?
-    public List<String> relatives = new ArrayList<>();
+    public List<String> relatives = new ArrayList<>(Collections.nCopies(26, ""));
     public int x;
     public int y;
     public int z;
-    public Signal(int x, int y, int z){
+    public int idx;
+
+    public Signal(int x, int y, int z, int idx){
         this.x = x;
         this.y = y;
         this.z = z;
+        this.idx = idx;
     }
 
     //Adds the other signal to this signals relatives, by fingerprinting 
@@ -111,15 +272,48 @@ class Signal {
         sb.append(dz);
         sb.append(",");
         sb.append(dist);
-        relatives.add(sb.toString());
+        // Add the fingerprint at the correct index
+        other.relatives.set(idx, sb.toString());
+        relatives.set(other.idx, sb.toString());
     }
 
-    public List<Signal> compare(Signal other){
-        List<Signal> result = new ArrayList<>();
+    public List<String> compare(Signal other){
+        List<String> result = new ArrayList<>();
         for(String s: relatives){
             if(other.relatives.indexOf(s) != -1){
-                
+                result.add(s);
             }
         }
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Signal at: " + x + ", " + y + ", " + z;
+    }
+}
+
+class Scanner {
+    public List<Signal> signals = new ArrayList<>();
+    public int x;
+    public int y;
+    public int z;
+    public boolean foundLocation = false;
+    
+    public void addSignal(String s, int idx){
+        String[] split = s.split(",");
+        int otherx = Integer.parseInt(split[0]);
+        int othery = Integer.parseInt(split[1]);
+        int otherz = Integer.parseInt(split[2]);
+        Signal newSignal = new Signal(otherx, othery, otherz, idx);
+        for(Signal sig: signals){
+            sig.align(newSignal);
+        }
+        signals.add(newSignal);
+    }
+
+    @Override
+    public String toString() {
+        return "Scanner at: "  + x + ", " + y + ", " + z;
     }
 }
