@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.util.*;
 
 public class Solution {
+    public static HashSet<String> beacons = new HashSet<>();
     public static void main(String[] args){
         long start = System.currentTimeMillis();
         System.out.println(problemOne());
@@ -10,6 +11,7 @@ public class Solution {
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
+    // 757 is too high
     public static int problemOne(){
         List<Scanner> scanners = generateScanners();
         Scanner s0 = scanners.get(0);
@@ -17,28 +19,35 @@ public class Solution {
         s0.y = 0;
         s0.z = 0;
         s0.foundLocation = true;
-        Scanner s1 = scanners.get(1);
-        Scanner s2 = scanners.get(2);
-        Scanner s3 = scanners.get(3);
-        Scanner s4 = scanners.get(4);
         int aligned = 0;
-        for(int i = 0; i < scanners.size(); i++){
-            for(int j = 0; j < scanners.size(); j++){
-                if(i != j){
-                    if((scanners.get(i).foundLocation || scanners.get(j).foundLocation) && !(scanners.get(i).foundLocation && scanners.get(j).foundLocation)){
-                        // System.out.println("Aligning scanners " + i + "and " + j);
-                        aligned += alignTwoScanners(scanners.get(i), scanners.get(j)) ? 1:0;
+        while(aligned < scanners.size() - 1){
+            for(int i = 0; i < scanners.size(); i++){
+                for(int j = 0; j < scanners.size(); j++){
+                    if(i != j){
+                        if((scanners.get(i).foundLocation && !(scanners.get(i).foundLocation && scanners.get(j).foundLocation))){
+                            if(alignTwoScanners(scanners.get(i), scanners.get(j))){
+                                System.out.println("Aligned scanners " + i + " and " + j + "\n");
+                                aligned++;
+                            }
+                        }
                     }
                 }
             }
         }
-        return aligned;
+        for(Scanner scan: scanners){
+            for(Signal sig: scan.signals){
+                beacons.add((sig.x+scan.x) + "," + (sig.y+scan.y) + "," + (sig.z+scan.z));
+            }
+            System.out.println(scan);
+        }
+        System.out.println("aligned scanners:" + aligned);
+        return beacons.size();
     }
 
+    // TODO: should mutate the signals for a scanner after you have found the right rotation
     public static boolean alignTwoScanners(Scanner s1, Scanner s2){
         for(Signal sig1: s1.signals){
             for(Signal sig2: s2.signals){
-                // TODO: not always finding all the common signals, for example with scanner 1 and 4 from the example (input 1)
                 List<String> common = sig1.compare(sig2);
                 if(common.size() >= 11){
                     List<int[]> coordsOne = new ArrayList<>();
@@ -54,7 +63,6 @@ public class Solution {
                         coordsTwo.add(ys);
                     }
                     int[][] rotations = rotations();
-                    // TODO: Not entirely certain that it always finds the right rotation
                     for(int[] rotation: rotations){
                         List<int[]> coordsTwoRotated = new ArrayList<>();
                         for(int[] coord: coordsTwo){
@@ -77,6 +85,7 @@ public class Solution {
                         }
                         if(allCorrect){
                             System.out.println("Distance between the two scanners: " + diffX + ", " + diffY + ", " + diffZ);
+                            // System.out.println("used rotation matrix: " + Arrays.toString(rotation));
                             // TODO: give the scanners their new positions, this might be broken
                             if(s1.foundLocation){
                                 s2.x = s1.x + diffX;
@@ -88,6 +97,14 @@ public class Solution {
                                 s1.y = s2.y + diffY;
                                 s1.z = s2.z + diffZ;
                                 s1.foundLocation = true;
+                            }
+                            // We have now found the correct rotation, so we rotate this scanners signals to match the correct rotation (relative to scanner 0)
+                            for(Signal s: s2.signals){
+                                int[] oldPos = {s.x, s.y, s.z};
+                                oldPos = matrixMul(oldPos, rotation);
+                                s.x = oldPos[0];
+                                s.y = oldPos[1];
+                                s.z = oldPos[2];
                             }
                         }
                     }
@@ -174,7 +191,7 @@ public class Solution {
 
     public static ArrayList<String> parseInputToArray(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("input1.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("input.txt"));
             ArrayList<String> list = new ArrayList<>();
             String line = reader.readLine();
             while(line != null){
@@ -191,7 +208,7 @@ public class Solution {
 }
 
 class Signal {
-    public List<String> relatives = new ArrayList<>(Collections.nCopies(26, ""));
+    public List<String> relatives = new ArrayList<>(Collections.nCopies(30, ""));
     public int x;
     public int y;
     public int z;
