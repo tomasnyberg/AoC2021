@@ -21,79 +21,24 @@ public class Solution {
         Scanner s2 = scanners.get(2);
         Scanner s3 = scanners.get(3);
         Scanner s4 = scanners.get(4);
+        int aligned = 0;
         for(int i = 0; i < scanners.size(); i++){
             for(int j = 0; j < scanners.size(); j++){
                 if(i != j){
                     if((scanners.get(i).foundLocation || scanners.get(j).foundLocation) && !(scanners.get(i).foundLocation && scanners.get(j).foundLocation)){
-                        System.out.println("Aligning scanners " + i + "and " + j);
-                        alignTwoScanners(scanners.get(i), scanners.get(j));
+                        // System.out.println("Aligning scanners " + i + "and " + j);
+                        aligned += alignTwoScanners(scanners.get(i), scanners.get(j)) ? 1:0;
                     }
                 }
             }
         }
-        // alignTwoScanners(s0, s1);
-
-        // for(Signal sig1: s1.signals){
-        //     for(Signal sig2: s2.signals){
-        //         List<String> common = sig1.compare(sig2);
-        //         if(common.size() >= 11){
-        //             List<int[]> coordsOne = new ArrayList<>();
-        //             List<int[]> coordsTwo = new ArrayList<>();
-        //             for(String s: common){
-        //                 int indexInSig1 = sig1.relatives.indexOf(s);
-        //                 int indexInSig2 = sig2.relatives.indexOf(s);
-        //                 Signal first = s1.signals.get(indexInSig1);
-        //                 Signal second = s2.signals.get(indexInSig2);
-        //                 int[] xs  = {first.x, first.y, first.z};
-        //                 int[] ys  = {second.x, second.y, second.z};
-        //                 coordsOne.add(xs);
-        //                 coordsTwo.add(ys);
-        //             }
-        //             int[][] rotations = rotations();
-        //             for(int[] rotation: rotations){
-        //                 List<int[]> coordsTwoRotated = new ArrayList<>();
-        //                 for(int[] coord: coordsTwo){
-        //                     coordsTwoRotated.add(matrixMul(coord, rotation));
-        //                 }
-        //                 int diffX = coordsOne.get(0)[0] - coordsTwoRotated.get(0)[0];
-        //                 int diffY = coordsOne.get(0)[1] - coordsTwoRotated.get(0)[1];
-        //                 int diffZ = coordsOne.get(0)[2] - coordsTwoRotated.get(0)[2];
-        //                 boolean allCorrect = true;
-        //                 for(int i = 0; i < coordsOne.size(); i++){
-        //                     int[] first = coordsOne.get(i);
-        //                     int[] second = coordsTwoRotated.get(i);
-        //                     int diffXnew = first[0] - second[0];
-        //                     int diffYnew = first[1] - second[1];
-        //                     int diffZnew = first[2] - second[2];
-        //                     if(diffX != diffXnew || diffY != diffYnew || diffZnew != diffZ){
-        //                         allCorrect = false;
-        //                         break;
-        //                     }
-        //                 }
-        //                 if(allCorrect){
-        //                     System.out.println("Distance between the two scanners: " + diffX + ", " + diffY + ", " + diffZ);
-        //                     if(s1.foundLocation){
-        //                         s2.x = s1.x +diffX;
-        //                         s2.y = s1.y + diffY;
-        //                         s2.z = s1.y + diffZ;
-        //                     } else if (s2.foundLocation){
-        //                         s1.x = s2.x + diffX;
-        //                         s1.y = s2.y + diffY;
-        //                         s1.z = s2.z + diffZ;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        // System.out.println("Scanner 1 : "  + s1);
-        // System.out.println("Scanner 2 : "  + s2);
-        return 0;
+        return aligned;
     }
 
     public static boolean alignTwoScanners(Scanner s1, Scanner s2){
         for(Signal sig1: s1.signals){
             for(Signal sig2: s2.signals){
+                // TODO: not always finding all the common signals, for example with scanner 1 and 4 from the example (input 1)
                 List<String> common = sig1.compare(sig2);
                 if(common.size() >= 11){
                     List<int[]> coordsOne = new ArrayList<>();
@@ -109,6 +54,7 @@ public class Solution {
                         coordsTwo.add(ys);
                     }
                     int[][] rotations = rotations();
+                    // TODO: Not entirely certain that it always finds the right rotation
                     for(int[] rotation: rotations){
                         List<int[]> coordsTwoRotated = new ArrayList<>();
                         for(int[] coord: coordsTwo){
@@ -131,16 +77,17 @@ public class Solution {
                         }
                         if(allCorrect){
                             System.out.println("Distance between the two scanners: " + diffX + ", " + diffY + ", " + diffZ);
+                            // TODO: give the scanners their new positions, this might be broken
                             if(s1.foundLocation){
-                                s2.x = s1.x +diffX;
+                                s2.x = s1.x + diffX;
                                 s2.y = s1.y + diffY;
-                                s2.z = s1.y + diffZ;
+                                s2.z = s1.z + diffZ;
                                 s2.foundLocation = true;
                             } else if (s2.foundLocation){
                                 s1.x = s2.x + diffX;
                                 s1.y = s2.y + diffY;
                                 s1.z = s2.z + diffZ;
-                                s2.foundLocation = true;
+                                s1.foundLocation = true;
                             }
                         }
                     }
@@ -150,7 +97,7 @@ public class Solution {
                 }
             }
         }
-        System.out.println("couldn't align");
+        // System.out.println("couldn't align");
         return false;
     }
 
@@ -259,17 +206,15 @@ class Signal {
 
     //Adds the other signal to this signals relatives, by fingerprinting 
     public void align(Signal other){
-        int dx = (int) Math.abs(other.x - x); 
-        int dy = (int) Math.abs(other.y - y); 
-        int dz = (int) Math.abs(other.z - z);
+        int dx = (int) Math.abs(x-other.x); 
+        int dy = (int) Math.abs(y-other.y); 
+        int dz = (int) Math.abs(z-other.z);
         // Not taking sqrt 
         int dist = dx*dx + dy*dy + dz*dz;
         StringBuilder sb = new StringBuilder();
-        sb.append(dx);
+        sb.append(Math.min(dx, Math.min(dy, dz)));
         sb.append(",");
-        sb.append(dy);
-        sb.append(",");
-        sb.append(dz);
+        sb.append(Math.max(dx, Math.max(dy, dz)));
         sb.append(",");
         sb.append(dist);
         // Add the fingerprint at the correct index
