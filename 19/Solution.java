@@ -11,7 +11,6 @@ public class Solution {
         System.out.println("This run took: "  + (System.currentTimeMillis() - start) +"ms");
     }
     
-    // 757 is too high
     public static int problemOne(){
         List<Scanner> scanners = generateScanners();
         Scanner s0 = scanners.get(0);
@@ -26,7 +25,6 @@ public class Solution {
                     if(i != j){
                         if((scanners.get(i).foundLocation && !(scanners.get(i).foundLocation && scanners.get(j).foundLocation))){
                             if(alignTwoScanners(scanners.get(i), scanners.get(j))){
-                                System.out.println("Aligned scanners " + i + " and " + j + "\n");
                                 aligned++;
                             }
                         }
@@ -40,11 +38,24 @@ public class Solution {
             }
             System.out.println(scan);
         }
-        System.out.println("aligned scanners:" + aligned);
+        System.out.println("Biggest manhattan: " + findBiggestDiff(scanners));
         return beacons.size();
     }
 
-    // TODO: should mutate the signals for a scanner after you have found the right rotation
+    public static int findBiggestDiff(List<Scanner> list){
+        int biggest = 0;
+        for(Scanner scan: list){
+            for(Scanner scan2: list){
+                int diffX = Math.abs(scan.x - scan2.x);
+                int diffY = Math.abs(scan.y - scan2.y);
+                int diffZ = Math.abs(scan.z - scan2.z);
+                int dist = diffX + diffY + diffZ;
+                biggest = dist > biggest ? dist:biggest;
+            }
+        }
+        return biggest;
+    }
+
     public static boolean alignTwoScanners(Scanner s1, Scanner s2){
         for(Signal sig1: s1.signals){
             for(Signal sig2: s2.signals){
@@ -84,9 +95,6 @@ public class Solution {
                             }
                         }
                         if(allCorrect){
-                            System.out.println("Distance between the two scanners: " + diffX + ", " + diffY + ", " + diffZ);
-                            // System.out.println("used rotation matrix: " + Arrays.toString(rotation));
-                            // TODO: give the scanners their new positions, this might be broken
                             if(s1.foundLocation){
                                 s2.x = s1.x + diffX;
                                 s2.y = s1.y + diffY;
@@ -108,13 +116,10 @@ public class Solution {
                             }
                         }
                     }
-                    System.out.println("Scanner 1 : "  + s1);
-                    System.out.println("Scanner 2 : "  + s2);
                     return true;
                 }
             }
         }
-        // System.out.println("couldn't align");
         return false;
     }
 
