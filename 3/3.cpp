@@ -25,9 +25,10 @@ int part_one(vector<string> &lines) {
     return stoi(a, 0, 2)*stoi(b, 0, 2);
 }
 
-int part_two(vector<string> &lines){
+int oxygen_co2(vector<string> &lines, bool oxygen){
     ll n = lines[0].length();
     set<int> removed = {};
+    cout << lines.size() << endl;
     for(int i = 0; i < n; i++){
         if(removed.size() == lines.size() - 1){
             break;
@@ -40,18 +41,29 @@ int part_two(vector<string> &lines){
                 count++;
             }
         }
-        char keep = count*2 >= (lines.size() - removed.size()) ? '1' : '0';
+        char keep = '.';
+        if (oxygen){
+            keep = count*2 >= (lines.size() - removed.size()) ? '1' : '0';
+        } else {
+            if (count*2 > (lines.size() - removed.size())){
+                keep = '0';
+            } else if (count*2 == (lines.size() - removed.size())){
+                keep = '0';
+            } else {
+                keep = '1';
+            }
+        }
         for(int j = 0; j < lines.size(); j++){
             if(removed.find(j) != removed.end()) continue;
             if(lines[j][i] != keep){
                 removed.insert(j);
             }
         }
-        cout << "current state:" << endl;
-        for(int j = 0; j < lines.size(); j++){
-            if(removed.find(j) != removed.end()) continue;
-            cout << lines[j] << endl;
-        }
+        // cout << "current state, i:" << i << " count: " << count << endl;
+        // for(int j = 0; j < lines.size(); j++){
+        //     if(removed.find(j) != removed.end()) continue;
+        //     cout << lines[j] << endl;
+        // }
     }
     for(int i = 0; i < lines.size(); i++){
         if(removed.find(i) == removed.end()){
@@ -61,12 +73,19 @@ int part_two(vector<string> &lines){
     return 0;
 }
 
+int part_two(vector<string> &lines){
+    int oxygen = oxygen_co2(lines, true);
+    int co2 = oxygen_co2(lines, false);
+    return oxygen * co2;
+}
+
 int main() {
     string line;
     vector<string> lines = {};
     while(cin){
         getline(cin, line);
         lines.push_back(line);
+        cout << line << endl;
     }
     int ans_two = part_two(lines);
     cout << "Part one answer: " << part_one(lines) << endl;
