@@ -13,17 +13,6 @@ void fill_counter(int counter[], vector<string> &lines){
         }
     }
 }
-int part_one(vector<string> &lines) {
-    int counter[lines.size()] = {0};
-    fill_counter(counter, lines);
-    string a = "";
-    string b = "";
-    for(int i = 0; i < lines[0].length(); i++){
-        a += counter[i] > lines.size() / 2 ? '1' : '0';
-        b += counter[i] <= lines.size() / 2 ? '1' : '0';
-    }
-    return stoi(a, 0, 2)*stoi(b, 0, 2);
-}
 
 int oxygen_co2(vector<string> &lines, bool oxygen){
     ll n = lines[0].length();
@@ -59,11 +48,6 @@ int oxygen_co2(vector<string> &lines, bool oxygen){
                 removed.insert(j);
             }
         }
-        // cout << "current state, i:" << i << " count: " << count << endl;
-        // for(int j = 0; j < lines.size(); j++){
-        //     if(removed.find(j) != removed.end()) continue;
-        //     cout << lines[j] << endl;
-        // }
     }
     for(int i = 0; i < lines.size(); i++){
         if(removed.find(i) == removed.end()){
@@ -71,6 +55,18 @@ int oxygen_co2(vector<string> &lines, bool oxygen){
         }
     }
     return 0;
+}
+
+int part_one(vector<string> &lines) {
+    int counter[lines.size()] = {0};
+    fill_counter(counter, lines);
+    string a = "";
+    string b = "";
+    for(int i = 0; i < lines[0].length(); i++){
+        a += counter[i] > lines.size() / 2 ? '1' : '0';
+        b += counter[i] <= lines.size() / 2 ? '1' : '0';
+    }
+    return stoi(a, 0, 2)*stoi(b, 0, 2);
 }
 
 int part_two(vector<string> &lines){
@@ -85,7 +81,6 @@ int main() {
     while(cin){
         getline(cin, line);
         lines.push_back(line);
-        cout << line << endl;
     }
     int ans_two = part_two(lines);
     cout << "Part one answer: " << part_one(lines) << endl;
