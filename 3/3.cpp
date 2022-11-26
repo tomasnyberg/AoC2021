@@ -17,7 +17,6 @@ void fill_counter(int counter[], vector<string> &lines){
 int oxygen_co2(vector<string> &lines, bool oxygen){
     ll n = lines[0].length();
     set<int> removed = {};
-    cout << lines.size() << endl;
     for(int i = 0; i < n; i++){
         if(removed.size() == lines.size() - 1){
             break;
@@ -84,5 +83,5 @@ int main() {
     }
     int ans_two = part_two(lines);
     cout << "Part one answer: " << part_one(lines) << endl;
-    cout << "Part two answer: " << ans_two << endl;
+    cout << "Part two answer: " << part_two(lines) << endl;
 }
