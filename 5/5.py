@@ -1,15 +1,6 @@
 import sys
 lines = list(map(str.strip, sys.stdin.readlines()))
 
-
-def check(matrix):
-    result = 0
-    for i in range(len(matrix)):
-        for j in range(len(matrix[0])):
-            if matrix[i][j] >= 2:
-                result += 1
-    return result
-
 def solve(coords):
     nondiag = list(filter(lambda x: x[0] == x[2] or x[1] == x[3], coords))
     diag = list(filter(lambda x: not (x[0] == x[2] or x[1] == x[3]), coords))
