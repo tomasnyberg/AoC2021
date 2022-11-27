@@ -29,23 +29,24 @@ def check_score(board, last):
         for x in xs:
             if x >= 0:
                 result += x
-    print(result, last)
     return result * last
 
 broken = False
+
+
+won = set()
 for x in bingonums:
     if broken: break
-    for b in boards:
+    for k in range(len(boards)):
+        if k in won: continue
+        b = boards[k]
         for xs in b:
             for i in range(len(xs)):
                 if xs[i] == x:
                     xs[i] = -1
         if check_bingo(b):
-            broken = True
-            print("win at this board")
-            for xs in b:
-                print(*xs)
-            print("Score", check_score(b, x))
-            break
-                
-    
+            won.add(k)
+            if len(won) == 1:
+                print("Part one:", check_score(b, x))
+            if len(won) == len(boards):
+                print("Part two:", check_score(b, x))
